@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BIEC - CodeLand by Kanan Shirinov 🚀</title>
+
+  <!-- Google Fonts — AZ/RU/EN tam Unicode dəstəyi -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800;900&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --sky:    #6ec6f5;
+      --sun:    #ffd966;
+      --grass:  #5dbb63;
+      --coral:  #ff6b6b;
+      --purple: #a78bfa;
+      --mint:   #34d399;
+      --bg:     #f0f9ff;
+      --card:   #ffffff;
+      --text:   #1e293b;
+      --sub:    #64748b;
+      --border: #e2e8f0;
+      --shadow: 0 4px 24px rgba(110,198,245,0.18);
+      --radius: 18px;
+      --f-ui:   'Nunito', 'Segoe UI', Arial, sans-serif;
+      --f-head: 'Baloo 2', 'Nunito', cursive;
+      --f-code: 'Courier New', Courier, monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--f-ui);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background:
+        radial-gradient(circle at 10% 20%, rgba(110,198,245,.18) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(167,139,250,.15) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(255,217,102,.08) 0%, transparent 60%);
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ── SHAPES ── */
+    .shape {
+      position: fixed; border-radius: 50%; opacity: .10;
+      pointer-events: none; z-index: 0;
+      animation: floatUp linear infinite;
+    }
+    .s1{width:90px;height:90px;background:var(--sky);top:5%;left:3%;animation-duration:14s;}
+    .s2{width:60px;height:60px;background:var(--sun);top:15%;right:5%;animation-duration:10s;animation-delay:-3s;}
+    .s3{width:70px;height:70px;background:var(--coral);bottom:10%;left:8%;animation-duration:12s;animation-delay:-6s;}
+    .s4{width:50px;height:50px;background:var(--purple);bottom:20%;right:10%;animation-duration:16s;animation-delay:-2s;}
+    .s5{width:40px;height:40px;background:var(--mint);top:50%;left:1%;animation-duration:9s;animation-delay:-4s;}
+    @keyframes floatUp{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(-22px) rotate(180deg);}}
+
+    /* ═══════════ HEADER ═══════════ */
+    header {
+      position: relative; z-index: 20;
+      background: linear-gradient(135deg,#6ec6f5 0%,#a78bfa 55%,#ff6b6b 100%);
+      height: 68px; padding: 0 20px;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      box-shadow: 0 4px 20px rgba(110,198,245,.35);
+    }
+
+    .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .logo-icon {
+      width: 44px; height: 44px; background: white; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; box-shadow: 0 2px 10px rgba(0,0,0,.15);
+      flex-shrink: 0;
+    }
+    .logo-text {
+      font-family: var(--f-head);
+      font-size: 26px; color: white;
+      text-shadow: 2px 2px 0 rgba(0,0,0,.15);
+    }
+    .logo-text span { color: var(--sun); }
+
+    .header-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+
+    /* ── LANG SWITCHER ── */
+    .lang-switcher { display: flex; gap: 5px; }
+    .lang-btn {
+      background: rgba(255,255,255,.18);
+      border: 2px solid rgba(255,255,255,.35);
+      border-radius: 10px; padding: 5px 9px;
+      cursor: pointer; font-family: var(--f-ui);
+      font-size: 13px; font-weight: 800; color: white;
+      display: flex; align-items: center; gap: 4px;
+      transition: all .18s; white-space: nowrap;
+    }
+    .lang-btn:hover { background: rgba(255,255,255,.32); transform: translateY(-1px); }
+    .lang-btn.active {
+      background: white; color: #7c3aed;
+      border-color: white; box-shadow: 0 2px 10px rgba(0,0,0,.15);
+    }
+    .flag { font-size: 17px; line-height: 1; }
+
+    .star-badge {
+      background: rgba(255,255,255,.25);
+      border: 2px solid rgba(255,255,255,.5);
+      border-radius: 20px; padding: 4px 13px;
+      font-family: var(--f-head); font-size: 15px; color: white;
+      white-space: nowrap;
+    }
+
+    /* ═══════════ MAIN ═══════════ */
+    main {
+      position: relative; z-index: 5;
+      max-width: 1400px; margin: 0 auto;
+      padding: 28px 20px 48px;
+    }
+
+    .hero { text-align: center; margin-bottom: 28px; }
+    .hero h1 {
+      font-family: var(--f-head);
+      font-size: clamp(22px, 4vw, 42px);
+      background: linear-gradient(135deg, #6ec6f5, #a78bfa, #ff6b6b);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; line-height: 1.25; margin-bottom: 8px;
+    }
+    .hero p { color: var(--sub); font-size: 16px; font-weight: 700; }
+
+    /* ═══════════ WORKSPACE ═══════════ */
+    .workspace {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 20px; align-items: start;
+    }
+    @media(max-width:900px){ .workspace{grid-template-columns:1fr;} }
+
+    /* ── PANEL ── */
+    .panel {
+      background: var(--card); border-radius: var(--radius);
+      box-shadow: var(--shadow); overflow: hidden;
+      border: 2.5px solid var(--border); transition: box-shadow .2s;
+    }
+    .panel:hover { box-shadow: 0 8px 36px rgba(110,198,245,.28); }
+
+    .panel-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 13px 18px; border-bottom: 2px solid var(--border);
+      background: linear-gradient(90deg,#f8fafc,#f1f5f9);
+    }
+    .dot{width:12px;height:12px;border-radius:50%;}
+    .dot-r{background:#ff6b6b;} .dot-y{background:#ffd966;} .dot-g{background:#5dbb63;}
+    .panel-title { font-family: var(--f-head); font-size: 17px; color: var(--text); flex: 1; }
+
+    /* ── TABS ── */
+    .tabs { display: flex; border-bottom: 2px solid var(--border); background: #f8fafc; }
+    .tab-btn {
+      flex: 1; padding: 10px 4px; border: none; background: transparent;
+      font-family: var(--f-head); font-size: 14px; color: var(--sub);
+      cursor: pointer; transition: all .2s;
+      border-bottom: 3px solid transparent;
+      display: flex; align-items: center; justify-content: center; gap: 5px;
+    }
+    .tab-btn.active { color: var(--text); background: white; border-bottom-color: var(--sky); }
+    .tab-btn:hover:not(.active){ background:#f1f5f9; color:var(--text); }
+
+    /* ── CODE AREA ── */
+    .code-area {
+      width: 100%; min-height: 340px; resize: vertical;
+      border: none; outline: none; padding: 18px;
+      font-family: var(--f-code); font-size: 14px; line-height: 1.75;
+      color: #1e293b; background: #fafbfd; tab-size: 2; display: block;
+    }
+
+    /* ── TOOLBAR ── */
+    .toolbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 18px; border-top: 2px solid var(--border);
+      background: #f8fafc; gap: 10px; flex-wrap: wrap;
+    }
+    .toolbar-left { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    /* ── BUTTONS ── */
+    .btn {
+      border: none; border-radius: 12px;
+      font-family: var(--f-head); font-size: 15px;
+      cursor: pointer; transition: all .18s;
+      display: flex; align-items: center; gap: 6px;
+      padding: 9px 18px;
+    }
+    .btn-run {
+      background: linear-gradient(135deg,#22c55e,#16a34a);
+      color: white; box-shadow: 0 4px 14px rgba(34,197,94,.4);
+      font-size: 16px; padding: 10px 24px;
+    }
+    .btn-run:hover { transform: translateY(-2px) scale(1.04); box-shadow: 0 6px 20px rgba(34,197,94,.5); }
+    .btn-run:active { transform: scale(.97); }
+    .btn-clear   { background:#fff4ed; color:#f97316; border:2px solid #fed7aa; }
+    .btn-clear:hover  { background:#ffedd5; transform:translateY(-1px); }
+    .btn-copy    { background:#f5f3ff; color:var(--purple); border:2px solid #ddd6fe; }
+    .btn-copy:hover   { background:#ede9fe; transform:translateY(-1px); }
+    .btn-example { background:#eff6ff; color:#3b82f6; border:2px solid #bfdbfe; }
+    .btn-example:hover{ background:#dbeafe; transform:translateY(-1px); }
+
+    /* ── PREVIEW ── */
+    .preview-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 13px 18px; border-bottom: 2px solid var(--border);
+      background: linear-gradient(90deg,#f0fdf4,#dcfce7);
+    }
+    .preview-status {
+      margin-left: auto; font-family: var(--f-ui);
+      font-size: 13px; font-weight: 700; color: var(--grass);
+      background: #dcfce7; border: 2px solid #bbf7d0;
+      border-radius: 20px; padding: 3px 12px;
+    }
+    .preview-status.idle { color:var(--sub); background:#f1f5f9; border-color:var(--border); }
+    #preview-frame { width:100%; min-height:420px; border:none; background:white; display:block; }
+
+    /* ── PLACEHOLDER ── */
+    .preview-placeholder {
+      min-height: 420px; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 14px; color: var(--sub);
+    }
+    .big-emoji { font-size: 60px; animation: wiggle 2s ease-in-out infinite; }
+    @keyframes wiggle{0%,100%{transform:rotate(-5deg);}50%{transform:rotate(5deg);}}
+    .preview-placeholder h3 { font-family: var(--f-head); font-size: 22px; color: var(--text); }
+    .preview-placeholder p  { font-size: 14px; font-weight: 600; max-width: 240px; text-align: center; }
+
+    /* ── TIPS ── */
+    .tips {
+      margin-top: 22px;
+      display: grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap: 14px;
+    }
+    .tip-card {
+      background: var(--card); border-radius: 14px; padding: 16px 18px;
+      border: 2px solid var(--border); box-shadow: var(--shadow);
+      cursor: pointer; transition: all .2s;
+    }
+    .tip-card:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(110,198,245,.25); }
+    .tip-icon  { font-size: 28px; margin-bottom: 6px; }
+    .tip-title { font-family: var(--f-head); font-size: 15px; margin-bottom: 4px; color: var(--text); }
+    .tip-desc  { font-size: 13px; font-weight: 600; color: var(--sub); line-height: 1.5; }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed; bottom: 30px; left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #1e293b; color: white;
+      padding: 12px 24px; border-radius: 30px;
+      font-family: var(--f-head); font-size: 16px;
+      opacity: 0; transition: all .35s cubic-bezier(.34,1.56,.64,1);
+      z-index: 999; pointer-events: none;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    @keyframes runFlash{
+      0%{box-shadow:0 0 0 0 rgba(34,197,94,0);}
+      50%{box-shadow:0 0 0 12px rgba(34,197,94,.3);}
+      100%{box-shadow:0 0 0 0 rgba(34,197,94,0);}
+    }
+    .run-flash { animation: runFlash .6s ease; }
+
+    @media(max-width:600px){
+      header{ padding:0 10px; height:60px; }
+      .logo-text{ font-size:20px; }
+      .star-badge{ display:none; }
+      .lang-btn{ padding:4px 7px; font-size:12px; }
+      .flag{ font-size:15px; }
+      .btn{ font-size:13px; padding:7px 12px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="shape s1"></div>
+<div class="shape s2"></div>
+<div class="shape s3"></div>
+<div class="shape s4"></div>
+<div class="shape s5"></div>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">🚀</div>
+    <div class="logo-text">BIEC <span>CodeLand</span> by Kanan Shirinov</div>
+  </div>
+  <div class="header-right">
+    <div class="lang-switcher">
+      <button class="lang-btn active" onclick="setLang('az')" id="btn-az"><span class="flag">🇦🇿</span> AZ</button>
+      <button class="lang-btn"        onclick="setLang('en')" id="btn-en"><span class="flag">🇬🇧</span> EN</button>
+      <button class="lang-btn"        onclick="setLang('ru')" id="btn-ru"><span class="flag">🇷🇺</span> RU</button>
+    </div>
+    <div class="star-badge" id="star-count">⭐ 0</div>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main>
+  <div class="hero">
+    <h1 id="hero-title">Kodu Yaz, Nəticəni Gör! 🎨</h1>
+    <p id="hero-sub">HTML &amp; CSS öyrən — aşağıda yaz, "Run Et" düyməsinə bas, sehri izlə! ✨</p>
+  </div>
+
+  <div class="workspace">
+
+    <!-- EDITOR PANEL -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+        <div class="panel-title" id="editor-panel-title">✏️ Kodunu Bura Yaz</div>
+      </div>
+
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="html"     onclick="switchTab('html')">🌐 HTML</button>
+        <button class="tab-btn"        data-tab="css"      onclick="switchTab('css')">🎨 CSS</button>
+        <button class="tab-btn"        data-tab="combined" onclick="switchTab('combined')" id="tab-combined-btn">🔀 Birlikdə</button>
+      </div>
+
+      <div id="editor-html"><textarea class="code-area" id="html-code" spellcheck="false"></textarea></div>
+      <div id="editor-css"  style="display:none"><textarea class="code-area" id="css-code"  spellcheck="false"></textarea></div>
+      <div id="editor-combined" style="display:none"><textarea class="code-area" id="combined-code" spellcheck="false"></textarea></div>
+
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <button class="btn btn-clear"   onclick="clearCode()">🗑️ <span data-i18n="btnClear">Sil</span></button>
+          <button class="btn btn-copy"    onclick="copyCode()">📋 <span data-i18n="btnCopy">Kopyala</span></button>
+          <button class="btn btn-example" onclick="loadExample()">💡 <span data-i18n="btnExample">Nümunə</span></button>
+        </div>
+        <button class="btn btn-run" onclick="runCode()" id="run-btn">▶️ <span data-i18n="btnRun">Run Et!</span></button>
+      </div>
+    </div>
+
+    <!-- PREVIEW PANEL -->
+    <div class="panel">
+      <div class="preview-header">
+        <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+        <div class="panel-title" id="preview-panel-title">👁️ Nəticəni Gör</div>
+        <div class="preview-status idle" id="preview-status">Gözləyir...</div>
+      </div>
+      <div id="preview-container">
+        <div class="preview-placeholder" id="placeholder">
+          <div class="big-emoji">🎯</div>
+          <h3 id="ph-title">Hazırsan?</h3>
+          <p id="ph-sub">Sol tərəfə kodunu yaz, sonra <strong>"Run Et!"</strong> düyməsinə bas</p>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /workspace -->
+
+  <!-- TIPS -->
+  <div class="tips">
+    <div class="tip-card" onclick="loadSnippet('colors')">
+      <div class="tip-icon">🌈</div>
+      <div class="tip-title" data-i18n="tipColors">Rənglər</div>
+      <div class="tip-desc"  data-i18n="tipColorsDesc">Fon və mətn rənglərini necə dəyişmək olar</div>
+    </div>
+    <div class="tip-card" onclick="loadSnippet('buttons')">
+      <div class="tip-icon">🔘</div>
+      <div class="tip-title" data-i18n="tipButtons">Düymələr</div>
+      <div class="tip-desc"  data-i18n="tipButtonsDesc">Rəngli və gözəl düymələr yarat</div>
+    </div>
+    <div class="tip-card" onclick="loadSnippet('animation')">
+      <div class="tip-icon">✨</div>
+      <div class="tip-title" data-i18n="tipAnim">Animasiya</div>
+      <div class="tip-desc"  data-i18n="tipAnimDesc">Hərəkət edən elementlər yarat</div>
+    </div>
+    <div class="tip-card" onclick="loadSnippet('card')">
+      <div class="tip-icon">🃏</div>
+      <div class="tip-title" data-i18n="tipCard">Kart Dizayn</div>
+      <div class="tip-desc"  data-i18n="tipCardDesc">Gözəl məlumat kartları düzəlt</div>
+    </div>
+    <div class="tip-card" onclick="loadSnippet('flex')">
+      <div class="tip-icon">📦</div>
+      <div class="tip-title" data-i18n="tipFlex">Sıralama</div>
+      <div class="tip-desc"  data-i18n="tipFlexDesc">Elementləri yana-yana düz</div>
+    </div>
+  </div>
+</main>
+
+<div class="toast" id="toast">
+  <span id="toast-emoji">✅</span><span id="toast-msg">Hazır!</span>
+</div>
+
+<script>
+/* ═══════════════════ i18n ═══════════════════ */
+const T = {
+  az: {
+    heroTitle:'Kodu Yaz, Nəticəni Gör! 🎨',
+    heroSub:'HTML & CSS öyrən — aşağıda yaz, "Run Et" düyməsinə bas, sehri izlə! ✨',
+    editorTitle:'✏️ Kodunu Bura Yaz', previewTitle:'👁️ Nəticəni Gör',
+    tabCombined:'🔀 Birlikdə',
+    btnClear:'Sil', btnCopy:'Kopyala', btnExample:'Nümunə', btnRun:'Run Et!',
+    phTitle:'Hazırsan?', phSub:'Sol tərəfə kodunu yaz, sonra <strong>"Run Et!"</strong> düyməsinə bas',
+    statusIdle:'Gözləyir...', statusActive:'✅ Aktiv',
+    tipColors:'Rənglər', tipColorsDesc:'Fon və mətn rənglərini necə dəyişmək olar',
+    tipButtons:'Düymələr', tipButtonsDesc:'Rəngli və gözəl düymələr yarat',
+    tipAnim:'Animasiya', tipAnimDesc:'Hərəkət edən elementlər yarat',
+    tipCard:'Kart Dizayn', tipCardDesc:'Gözəl məlumat kartları düzəlt',
+    tipFlex:'Sıralama', tipFlexDesc:'Elementləri yana-yana düz',
+    toastRun:'Bravo! Kod işlədi!', toastClear:'Kod silindi!',
+    toastCopy:'Kopyalandı!', toastExample:'Nümunə yükləndi!',
+    toastSnippet:'Hazır! İndi Run Et!', toastEmpty:'Əvvəlcə kod yaz!',
+    stars:'Ulduz',
+    htmlPH:`<h1>Salam Dünya!</h1>\n<p>HTML öyrənmək əyləncəlidir 🎉</p>`,
+    cssPH:`body {\n  background: #fffde7;\n  font-family: sans-serif;\n  padding: 20px;\n}\nh1 { color: purple; }`,
+    comboPH:`<style>\n  h1 { color: blue; }\n</style>\n<h1>Salam!</h1>`
+  },
+  en: {
+    heroTitle:'Write Code, See the Result! 🎨',
+    heroSub:'Learn HTML & CSS — type below, press "Run It!", watch the magic! ✨',
+    editorTitle:'✏️ Write Your Code Here', previewTitle:'👁️ See the Result',
+    tabCombined:'🔀 Together',
+    btnClear:'Clear', btnCopy:'Copy', btnExample:'Example', btnRun:'Run It!',
+    phTitle:'Ready?', phSub:'Write code on the left, then press <strong>"Run It!"</strong>',
+    statusIdle:'Waiting...', statusActive:'✅ Active',
+    tipColors:'Colors', tipColorsDesc:'How to change background and text colors',
+    tipButtons:'Buttons', tipButtonsDesc:'Create colorful and beautiful buttons',
+    tipAnim:'Animation', tipAnimDesc:'Create moving elements',
+    tipCard:'Card Design', tipCardDesc:'Build beautiful info cards',
+    tipFlex:'Layout', tipFlexDesc:'Arrange elements side by side',
+    toastRun:'Bravo! Code worked!', toastClear:'Code cleared!',
+    toastCopy:'Copied!', toastExample:'Example loaded!',
+    toastSnippet:'Ready! Now Run It!', toastEmpty:'Write some code first!',
+    stars:'Stars',
+    htmlPH:`<h1>Hello World!</h1>\n<p>Learning HTML is so fun 🎉</p>`,
+    cssPH:`body {\n  background: #e3f2fd;\n  font-family: sans-serif;\n  padding: 20px;\n}\nh1 { color: navy; }`,
+    comboPH:`<style>\n  h1 { color: green; }\n</style>\n<h1>Hello!</h1>`
+  },
+  ru: {
+    heroTitle:'Пиши Код, Смотри Результат! 🎨',
+    heroSub:'Учи HTML и CSS — пиши внизу, нажми "Запустить!", смотри магию! ✨',
+    editorTitle:'✏️ Пиши Код Сюда', previewTitle:'👁️ Смотри Результат',
+    tabCombined:'🔀 Вместе',
+    btnClear:'Очистить', btnCopy:'Копировать', btnExample:'Пример', btnRun:'Запустить!',
+    phTitle:'Готов?', phSub:'Напиши код слева, затем нажми <strong>"Запустить!"</strong>',
+    statusIdle:'Ожидание...', statusActive:'✅ Активен',
+    tipColors:'Цвета', tipColorsDesc:'Как изменить цвет фона и текста',
+    tipButtons:'Кнопки', tipButtonsDesc:'Создавай красивые цветные кнопки',
+    tipAnim:'Анимация', tipAnimDesc:'Создавай движущиеся элементы',
+    tipCard:'Карточки', tipCardDesc:'Создавай красивые информационные карточки',
+    tipFlex:'Расположение', tipFlexDesc:'Выстраивай элементы в ряд',
+    toastRun:'Браво! Код работает!', toastClear:'Код очищен!',
+    toastCopy:'Скопировано!', toastExample:'Пример загружен!',
+    toastSnippet:'Готово! Теперь запусти!', toastEmpty:'Сначала напиши код!',
+    stars:'Звёзд',
+    htmlPH:`<h1>Привет, Мир!</h1>\n<p>Учить HTML так весело 🎉</p>`,
+    cssPH:`body {\n  background: #fce4ec;\n  font-family: sans-serif;\n  padding: 20px;\n}\nh1 { color: #c2185b; }`,
+    comboPH:`<style>\n  h1 { color: red; }\n</style>\n<h1>Привет!</h1>`
+  }
+};
+
+/* ═══════════════════ SNIPPETS ═══════════════════ */
+const snippets = {
+  colors:{
+    html:{
+      az:`<h1>Rəngli Səhifəm 🌈</h1>\n<p>Bu söz <span class="r">qırmızı</span>, bu isə <span class="b">mavidir</span>!</p>\n<div class="box">Rəngli qutu 📦</div>`,
+      en:`<h1>My Colorful Page 🌈</h1>\n<p>This word is <span class="r">red</span>, this one is <span class="b">blue</span>!</p>\n<div class="box">Colorful box 📦</div>`,
+      ru:`<h1>Моя Цветная Страница 🌈</h1>\n<p>Это слово <span class="r">красное</span>, а это <span class="b">синее</span>!</p>\n<div class="box">Цветная коробка 📦</div>`
+    },
+    css:`body{background:#fffde7;font-family:sans-serif;text-align:center;padding:30px;}\nh1{color:#9c27b0;}\n.r{color:#e53935;font-weight:bold;}\n.b{color:#1e88e5;font-weight:bold;}\n.box{background:linear-gradient(135deg,#f06292,#ba68c8);color:white;padding:20px;border-radius:12px;margin-top:20px;font-size:20px;}`
+  },
+  buttons:{
+    html:{
+      az:`<h2>Gözəl Düymələr 🔘</h2>\n<button class="g">✅ Uğurlu</button>\n<button class="o">🚀 Başla</button>\n<button class="p">💖 Bəyəndim</button>`,
+      en:`<h2>Beautiful Buttons 🔘</h2>\n<button class="g">✅ Success</button>\n<button class="o">🚀 Start</button>\n<button class="p">💖 Like</button>`,
+      ru:`<h2>Красивые Кнопки 🔘</h2>\n<button class="g">✅ Успех</button>\n<button class="o">🚀 Старт</button>\n<button class="p">💖 Нравится</button>`
+    },
+    css:`body{display:flex;flex-direction:column;align-items:center;gap:16px;padding:40px;background:#f3e5f5;font-family:sans-serif;}\nbutton{border:none;border-radius:30px;padding:14px 32px;font-size:18px;font-weight:bold;cursor:pointer;transition:transform .2s;}\nbutton:hover{transform:scale(1.1);}\n.g{background:#4caf50;color:white;}\n.o{background:#ff9800;color:white;}\n.p{background:#e91e63;color:white;}`
+  },
+  animation:{
+    html:{az:`<div class="star">⭐</div>\n<div class="bounce">🏀</div>\n<div class="spin">🌀</div>`,en:`<div class="star">⭐</div>\n<div class="bounce">🏀</div>\n<div class="spin">🌀</div>`,ru:`<div class="star">⭐</div>\n<div class="bounce">🏀</div>\n<div class="spin">🌀</div>`},
+    css:`body{display:flex;justify-content:center;align-items:center;gap:40px;height:200px;background:#1a1a2e;}\n.star{font-size:50px;animation:pulse 1s infinite alternate;}\n.bounce{font-size:50px;animation:jump .8s infinite alternate;}\n.spin{font-size:50px;animation:rotate 2s linear infinite;}\n@keyframes pulse{from{transform:scale(1);}to{transform:scale(1.4);}}\n@keyframes jump{from{transform:translateY(0);}to{transform:translateY(-40px);}}\n@keyframes rotate{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}`
+  },
+  card:{
+    html:{
+      az:`<div class="card">\n  <div class="av">🦁</div>\n  <h2>Aslan Əsgərov</h2>\n  <p class="role">Kod Qəhrəmanı 🦸</p>\n  <div class="tags"><span>HTML</span><span>CSS</span><span>JS</span></div>\n</div>`,
+      en:`<div class="card">\n  <div class="av">🦁</div>\n  <h2>Alex Champion</h2>\n  <p class="role">Code Hero 🦸</p>\n  <div class="tags"><span>HTML</span><span>CSS</span><span>JS</span></div>\n</div>`,
+      ru:`<div class="card">\n  <div class="av">🦁</div>\n  <h2>Алекс Чемпион</h2>\n  <p class="role">Герой Кода 🦸</p>\n  <div class="tags"><span>HTML</span><span>CSS</span><span>JS</span></div>\n</div>`
+    },
+    css:`body{display:flex;justify-content:center;align-items:center;min-height:100vh;background:linear-gradient(135deg,#667eea,#764ba2);margin:0;}\n.card{background:white;border-radius:20px;padding:30px;text-align:center;width:240px;box-shadow:0 10px 40px rgba(0,0,0,.2);}\n.av{font-size:60px;margin-bottom:10px;}\nh2{margin:0 0 6px;color:#333;}\n.role{color:#888;margin-bottom:16px;}\n.tags{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}\n.tags span{background:#ede9fe;color:#7c3aed;padding:4px 12px;border-radius:20px;font-size:13px;font-weight:bold;}`
+  },
+  flex:{
+    html:{
+      az:`<div class="row">\n  <div class="box" style="background:#ff6b6b">🍎 Alma</div>\n  <div class="box" style="background:#ffd93d">🍋 Limon</div>\n  <div class="box" style="background:#6bcb77">🍀 Yonca</div>\n  <div class="box" style="background:#4d96ff">🫐 Çiyələk</div>\n</div>`,
+      en:`<div class="row">\n  <div class="box" style="background:#ff6b6b">🍎 Apple</div>\n  <div class="box" style="background:#ffd93d">🍋 Lemon</div>\n  <div class="box" style="background:#6bcb77">🍀 Clover</div>\n  <div class="box" style="background:#4d96ff">🫐 Blueberry</div>\n</div>`,
+      ru:`<div class="row">\n  <div class="box" style="background:#ff6b6b">🍎 Яблоко</div>\n  <div class="box" style="background:#ffd93d">🍋 Лимон</div>\n  <div class="box" style="background:#6bcb77">🍀 Клевер</div>\n  <div class="box" style="background:#4d96ff">🫐 Черника</div>\n</div>`
+    },
+    css:`body{padding:30px;background:#f8f9fa;font-family:sans-serif;}\n.row{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;}\n.box{color:white;font-size:18px;font-weight:bold;padding:24px 28px;border-radius:16px;text-align:center;transition:transform .2s;}\n.box:hover{transform:scale(1.1) rotate(3deg);}`
+  }
+};
+
+const examples = {
+  az:{html:`<h1>Salam Dünya! 🌍</h1>\n<p>Mən ilk HTML səhifəmi yazdım!</p>\n<ul>\n  <li>🍕 Pitsanı sevirəm</li>\n  <li>🎮 Oyun oynamağı sevirəm</li>\n  <li>💻 Kod yazmağı sevirəm</li>\n</ul>`,css:`body{background:#e8f5e9;font-family:sans-serif;padding:30px;max-width:500px;margin:0 auto;}\nh1{color:#2e7d32;text-align:center;}\nli{font-size:18px;margin-bottom:8px;}`},
+  en:{html:`<h1>Hello World! 🌍</h1>\n<p>I just wrote my first HTML page!</p>\n<ul>\n  <li>🍕 I love pizza</li>\n  <li>🎮 I love gaming</li>\n  <li>💻 I love coding</li>\n</ul>`,css:`body{background:#e3f2fd;font-family:sans-serif;padding:30px;max-width:500px;margin:0 auto;}\nh1{color:#0d47a1;text-align:center;}\nli{font-size:18px;margin-bottom:8px;}`},
+  ru:{html:`<h1>Привет, Мир! 🌍</h1>\n<p>Я только что написал первую HTML-страницу!</p>\n<ul>\n  <li>🍕 Я люблю пиццу</li>\n  <li>🎮 Я люблю игры</li>\n  <li>💻 Я люблю кодить</li>\n</ul>`,css:`body{background:#fce4ec;font-family:sans-serif;padding:30px;max-width:500px;margin:0 auto;}\nh1{color:#880e4f;text-align:center;}\nli{font-size:18px;margin-bottom:8px;}`}
+};
+
+/* ═══════════════════ STATE ═══════════════════ */
+let lang='az', activeTab='html', stars=0, runCount=0;
+
+/* ═══════════════════ LANG ═══════════════════ */
+function setLang(l){
+  lang=l;
+  document.documentElement.lang=l;
+  ['az','en','ru'].forEach(x=>document.getElementById('btn-'+x).classList.toggle('active',x===l));
+  const t=T[l];
+
+  document.getElementById('hero-title').textContent=t.heroTitle;
+  document.getElementById('hero-sub').textContent=t.heroSub;
+  document.getElementById('editor-panel-title').textContent=t.editorTitle;
+  document.getElementById('preview-panel-title').textContent=t.previewTitle;
+  document.getElementById('tab-combined-btn').textContent=t.tabCombined;
+
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const k=el.getAttribute('data-i18n');
+    if(t[k]) el.textContent=t[k];
+  });
+
+  document.getElementById('html-code').placeholder=t.htmlPH;
+  document.getElementById('css-code').placeholder=t.cssPH;
+  document.getElementById('combined-code').placeholder=t.comboPH;
+
+  const st=document.getElementById('preview-status');
+  st.textContent=st.classList.contains('idle')?t.statusIdle:t.statusActive;
+
+  const ph=document.getElementById('ph-title');
+  const ps=document.getElementById('ph-sub');
+  if(ph) ph.textContent=t.phTitle;
+  if(ps) ps.innerHTML=t.phSub;
+
+  document.getElementById('star-count').textContent=`⭐ ${stars} ${t.stars}`;
+}
+
+/* ═══════════════════ TABS ═══════════════════ */
+function switchTab(tab){
+  activeTab=tab;
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+  ['html','css','combined'].forEach(t=>{
+    document.getElementById(`editor-${t}`).style.display=t===tab?'':'none';
+  });
+}
+
+/* ═══════════════════ RUN ═══════════════════ */
+function runCode(){
+  const t=T[lang];
+  if(activeTab==='combined'){
+    const raw=document.getElementById('combined-code').value.trim();
+    if(!raw){showToast('⚠️',t.toastEmpty);return;}
+    renderInFrame(`<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>${raw}</body></html>`);
+  } else {
+    const html=document.getElementById('html-code').value.trim();
+    const css=document.getElementById('css-code').value.trim();
+    if(!html&&!css){showToast('⚠️',t.toastEmpty);return;}
+    renderInFrame(`<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{margin:0;padding:10px;font-family:sans-serif;}${css}</style></head><body>${html}</body></html>`);
+  }
+  runCount++;
+  if(runCount%3===0){stars++;updateStars();}
+  showToast('🚀',t.toastRun);
+  const btn=document.getElementById('run-btn');
+  btn.classList.remove('run-flash');
+  void btn.offsetWidth;
+  btn.classList.add('run-flash');
+}
+
+function renderInFrame(content){
+  const container=document.getElementById('preview-container');
+  const ph=document.getElementById('placeholder');
+  if(ph) ph.remove();
+  let frame=document.getElementById('preview-frame');
+  if(!frame){
+    frame=document.createElement('iframe');
+    frame.id='preview-frame';
+    frame.setAttribute('sandbox','allow-scripts allow-same-origin');
+    container.appendChild(frame);
+  }
+  frame.srcdoc=content;
+  const st=document.getElementById('preview-status');
+  st.textContent=T[lang].statusActive;
+  st.classList.remove('idle');
+}
+
+/* ═══════════════════ CLEAR ═══════════════════ */
+function clearCode(){
+  const t=T[lang];
+  if(activeTab==='combined'){document.getElementById('combined-code').value='';}
+  else{document.getElementById('html-code').value='';document.getElementById('css-code').value='';}
+  document.getElementById('preview-container').innerHTML=`<div class="preview-placeholder" id="placeholder">
+    <div class="big-emoji">🎯</div>
+    <h3 id="ph-title">${t.phTitle}</h3>
+    <p id="ph-sub">${t.phSub}</p>
+  </div>`;
+  const st=document.getElementById('preview-status');
+  st.textContent=t.statusIdle; st.classList.add('idle');
+  showToast('🗑️',t.toastClear);
+}
+
+/* ═══════════════════ COPY ═══════════════════ */
+function copyCode(){
+  const t=T[lang];
+  let text=activeTab==='combined'
+    ?document.getElementById('combined-code').value
+    :document.getElementById('html-code').value+'\n\n'+document.getElementById('css-code').value;
+  if(!text.trim()){showToast('⚠️',t.toastEmpty);return;}
+  navigator.clipboard.writeText(text).then(()=>showToast('📋',t.toastCopy));
+}
+
+/* ═══════════════════ EXAMPLE ═══════════════════ */
+function loadExample(){
+  const ex=examples[lang];
+  switchTab('html');
+  document.getElementById('html-code').value=ex.html;
+  document.getElementById('css-code').value=ex.css;
+  showToast('💡',T[lang].toastExample);
+}
+
+/* ═══════════════════ SNIPPET ═══════════════════ */
+function loadSnippet(key){
+  const s=snippets[key];
+  if(!s) return;
+  switchTab('html');
+  const h=typeof s.html==='string'?s.html:(s.html[lang]||s.html.az);
+  document.getElementById('html-code').value=h;
+  document.getElementById('css-code').value=s.css;
+  showToast('✨',T[lang].toastSnippet);
+}
+
+/* ═══════════════════ STARS ═══════════════════ */
+function updateStars(){
+  document.getElementById('star-count').textContent=`⭐ ${stars} ${T[lang].stars}`;
+}
+
+/* ═══════════════════ TOAST ═══════════════════ */
+function showToast(emoji,msg){
+  const el=document.getElementById('toast');
+  document.getElementById('toast-emoji').textContent=emoji;
+  document.getElementById('toast-msg').textContent=msg;
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2500);
+}
+
+/* ═══════════════════ KEYBOARD ═══════════════════ */
+document.querySelectorAll('.code-area').forEach(ta=>{
+  ta.addEventListener('keydown',e=>{
+    if(e.key==='Tab'){
+      e.preventDefault();
+      const s=ta.selectionStart,end=ta.selectionEnd;
+      ta.value=ta.value.substring(0,s)+'  '+ta.value.substring(end);
+      ta.selectionStart=ta.selectionEnd=s+2;
+    }
+    if((e.ctrlKey||e.metaKey)&&e.key==='Enter') runCode();
+  });
+});
+
+/* INIT */
+setLang('az');
+</script>
+</body>
+</html>
