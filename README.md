@@ -1,158 +1,191 @@
-# KodLand 🚀 — Quraşdırma Təlimatı
+# KodLand 🚀 — Tam Quraşdırma Təlimatı
 
 ## Fayllar
 ```
-index.html          ← Login səhifəsi
-editor.html         ← Əsas redaktor
+index.html          ← Giriş səhifəsi (username + şifrə)
+editor.html         ← Şagird redaktoru
 admin.html          ← Admin panel
-supabase-config.js  ← ⚠️ SİZİN MƏLUMATLARINIZI BURAYA YAZIN
+supabase-config.js  ← ⚠️ Öz məlumatlarınızı buraya yazın
 ```
 
 ---
 
-## 1. Supabase Hesabı Açın
+## Addım 1 — Supabase Hesabı
 
 1. [supabase.com](https://supabase.com) → **Start for free**
-2. GitHub ilə giriş edin
-3. **New Project** yaradın → ad verin, şifrə seçin, region: **Frankfurt (EU)**
+2. **New Project** → ad verin, region: **Frankfurt (EU)**
+3. **Settings → API** bölməsinə gedin, iki şeyi kopyalayın:
+   - `Project URL`
+   - `anon public` key
 
----
-
-## 2. supabase-config.js Faylını Doldurun
-
-Project yarandıqdan sonra:
-**Settings → API** bölməsinə gedin
-
+`supabase-config.js` faylını açın, dəyərləri yazın:
 ```js
-const SUPABASE_URL  = 'https://XXXXXXXXXXXX.supabase.co';  // Project URL
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIs...';           // anon public key
+const SUPABASE_URL  = 'https://xxxxxxxxxxxx.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIs...';
+const DOMAIN_SUFFIX = '@kodland.local';
 ```
 
 ---
 
-## 3. Verilənlər Bazası Cədvəllərini Yaradın
+## Addım 2 — Email Konfirmasiyasını Söndürün
 
-Supabase → **SQL Editor** → **New query** → aşağıdakı SQL-i yapışdırın → **Run**:
+**Supabase → Authentication → Providers → Email**
+
+- **"Confirm email"** — SÖNDÜRÜN (OFF)
+- Saxlayın
+
+> Bu olmadan şagirdlər sistemə girə bilməz!
+
+---
+
+## Addım 3 — Verilənlər Bazası
+
+**Supabase → SQL Editor → New query** — aşağıdakı SQL-i yapışdırın → **Run**:
 
 ```sql
--- İstifadəçi profilləri
-CREATE TABLE profiles (
+-- ═══════════════════════════════════════
+--  1. PROFILES CƏDVƏLİ
+-- ═══════════════════════════════════════
+CREATE TABLE IF NOT EXISTS profiles (
   id          UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   email       TEXT,
   full_name   TEXT,
-  role        TEXT DEFAULT 'user',  -- 'user' və ya 'admin'
+  username    TEXT UNIQUE,
+  role        TEXT DEFAULT 'user',
   created_at  TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Kod arxivi
-CREATE TABLE code_archive (
+-- ═══════════════════════════════════════
+--  2. KOD ARXİVİ
+-- ═══════════════════════════════════════
+CREATE TABLE IF NOT EXISTS code_archive (
   id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id       UUID REFERENCES profiles(id) ON DELETE CASCADE,
-  html_code     TEXT,
-  css_code      TEXT,
-  combined_code TEXT,
+  html_code     TEXT DEFAULT '',
+  css_code      TEXT DEFAULT '',
+  combined_code TEXT DEFAULT '',
   active_tab    TEXT DEFAULT 'html',
   lang          TEXT DEFAULT 'az',
+  trigger       TEXT DEFAULT 'run',  -- 'run' və ya 'newtab'
+  score         INTEGER CHECK (score BETWEEN 1 AND 5),
   created_at    TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Profili avtomatik yarat (hər qeydiyyatda)
+-- ═══════════════════════════════════════
+--  3. OTOMATİK PROFİL YARAT
+-- ═══════════════════════════════════════
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO public.profiles (id, email, full_name, role)
+  INSERT INTO public.profiles (id, email, full_name, username, role)
   VALUES (
     NEW.id,
     NEW.email,
-    NEW.raw_user_meta_data->>'full_name',
+    COALESCE(NEW.raw_user_meta_data->>'full_name', ''),
+    COALESCE(NEW.raw_user_meta_data->>'username',
+             SPLIT_PART(NEW.email, '@', 1)),
     'user'
   )
-  ON CONFLICT (id) DO NOTHING;
+  ON CONFLICT (id) DO UPDATE SET
+    full_name = EXCLUDED.full_name,
+    username  = EXCLUDED.username;
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
-CREATE OR REPLACE TRIGGER on_auth_user_created
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
-```
 
----
-
-## 4. Row Level Security (RLS) Qaydaları
-
-```sql
--- profiles: hər kəs öz profilini görsün, admin hamısını
-ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Users can view own profile"
-  ON profiles FOR SELECT
-  USING (auth.uid() = id OR EXISTS (
-    SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin'
-  ));
-
-CREATE POLICY "Users can update own profile"
-  ON profiles FOR UPDATE USING (auth.uid() = id);
-
-CREATE POLICY "Admin can insert profiles"
-  ON profiles FOR INSERT
-  WITH CHECK (true);
-
-CREATE POLICY "Admin can delete profiles"
-  ON profiles FOR DELETE
-  USING (EXISTS (
-    SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin'
-  ));
-
--- code_archive: hər kəs öz kodlarını görsün, admin hamısını
+-- ═══════════════════════════════════════
+--  4. ROW LEVEL SECURITY
+-- ═══════════════════════════════════════
+ALTER TABLE profiles     ENABLE ROW LEVEL SECURITY;
 ALTER TABLE code_archive ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Users manage own archive"
-  ON code_archive FOR ALL
-  USING (auth.uid() = user_id OR EXISTS (
-    SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin'
-  ));
+-- profiles: öz profilini gör, admin hamısını görsün
+DROP POLICY IF EXISTS "profiles_select" ON profiles;
+CREATE POLICY "profiles_select" ON profiles FOR SELECT
+  USING (
+    auth.uid() = id
+    OR EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
+  );
+
+DROP POLICY IF EXISTS "profiles_insert" ON profiles;
+CREATE POLICY "profiles_insert" ON profiles FOR INSERT WITH CHECK (true);
+
+DROP POLICY IF EXISTS "profiles_update" ON profiles;
+CREATE POLICY "profiles_update" ON profiles FOR UPDATE USING (true);
+
+DROP POLICY IF EXISTS "profiles_delete" ON profiles;
+CREATE POLICY "profiles_delete" ON profiles FOR DELETE
+  USING (EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin'));
+
+-- code_archive: öz kodunu gör; admin hamısını görsün və qiymət versin
+DROP POLICY IF EXISTS "archive_all" ON code_archive;
+CREATE POLICY "archive_all" ON code_archive FOR ALL
+  USING (
+    auth.uid() = user_id
+    OR EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
+  );
 ```
 
 ---
 
-## 5. İlk Admin İstifadəçisini Əlavə Edin
+## Addım 4 — İlk Admin Yaradın
 
-**Supabase → Authentication → Users → Invite user** ilə özünüzü əlavə edin.
+1. **Supabase → Authentication → Users → Add user**
+   - Email: `admin@kodland.local`
+   - Password: seçdiyiniz şifrə
+   - **"Auto Confirm User"** — işarələyin
 
-Sonra **SQL Editor**-da:
+2. **SQL Editor**-da:
 ```sql
--- Öz e-poçtunuzu yazın
-UPDATE profiles SET role = 'admin'
-WHERE email = 'siz@email.com';
+UPDATE profiles SET role = 'admin', username = 'admin'
+WHERE email = 'admin@kodland.local';
 ```
+
+3. Sistemə giriş edin:
+   - İstifadəçi adı: `admin`
+   - Şifrə: yuxarıda seçdiyiniz
 
 ---
 
-## 6. Netlify-ə Yükləyin
+## Addım 5 — Netlify Deploy
 
 1. Bütün faylları GitHub reposuna atın
 2. [netlify.com](https://netlify.com) → **Add new site → Import from Git**
-3. Reposu seçin → **Deploy**
+3. Reposu seçin → **Deploy site**
 4. Hazırdır! 🎉
 
 ---
 
-## Xülasə: Səhifələr
+## Sistem Necə İşləyir
 
-| Səhifə | URL | Kimə |
-|--------|-----|------|
-| `index.html` | `/` | Hamı (login) |
-| `editor.html` | `/editor.html` | Login olmuş istifadəçilər |
-| `admin.html` | `/admin.html` | Yalnız adminlər |
+### Şagird girişi
+- Yalnız **İstifadəçi adı + Şifrə** daxil edir
+- Admin hər şagird üçün hesab yaradır
+
+### Arxiv
+- Şagird **Run Et** vuranda da, **Yeni Tab** seçəndə də kod arxivə düşür
+- Arxiv çekmecəsindən keçmiş kodlara baxa bilər, yükləyə bilər
+
+### Qiymətləndirmə (Admin)
+- Arxiv → "Bax & Qiymət" düyməsi → kodun nəticəsini görür
+- 1-5 ulduz verir
+- Şagirdin **ortalama balı** həm admin paneldə, həm şagirdin öz səhifəsinin yuxarısında görünür
+
+### Ortalama bal (Şagird)
+- Header-də: `⭐⭐⭐ 3.5` formatında görünür
+- Hər yeni qiymət veriləndə avtomatik yenilənir
 
 ---
 
-## Funksiyalar
+## Səhifələr Xülasəsi
 
-- ✅ **Login / Qeydiyyat** — Supabase Auth
-- ✅ **3 dil** — AZ / EN / RU (bayraq düymələri)
-- ✅ **HTML + CSS redaktor** — Run Et / Yeni Tab
-- ✅ **Arxiv** — hər Run etdikdə avtomatik saxlanır
-- ✅ **Arxiv Çekmeci** — tarix/saat ilə göstərilir, yükləmək/silmək olur
-- ✅ **Admin Panel** — istifadəçi əlavə et/sil, arxivi izlə, statistika
+| Səhifə | Kimə açıqdır |
+|--------|-------------|
+| `index.html` | Hamı |
+| `editor.html` | Login olmuş şagirdlər |
+| `admin.html` | Yalnız adminlər |

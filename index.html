@@ -10,291 +10,219 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
   <style>
-    :root{
-      --f-head:'Baloo 2',sans-serif;
-      --f-ui:'Nunito',sans-serif;
-    }
+    :root{--fh:'Baloo 2',sans-serif;--fu:'Nunito',sans-serif;}
     *{box-sizing:border-box;margin:0;padding:0;}
-    body{
-      font-family:var(--f-ui);
-      min-height:100vh;
+    body{font-family:var(--fu);min-height:100vh;
       background:linear-gradient(135deg,#6ec6f5 0%,#a78bfa 55%,#ff6b6b 100%);
-      display:flex;align-items:center;justify-content:center;
-      padding:20px;
-      overflow:hidden;
-    }
+      display:flex;align-items:center;justify-content:center;padding:20px;overflow:hidden;}
 
-    /* floating shapes */
     .shape{position:fixed;border-radius:50%;opacity:.12;pointer-events:none;animation:flt linear infinite;}
-    .s1{width:100px;height:100px;background:#fff;top:5%;left:5%;animation-duration:14s;}
-    .s2{width:70px;height:70px;background:#ffd966;top:20%;right:8%;animation-duration:10s;animation-delay:-4s;}
-    .s3{width:80px;height:80px;background:#fff;bottom:10%;left:10%;animation-duration:12s;animation-delay:-7s;}
-    .s4{width:55px;height:55px;background:#ffd966;bottom:25%;right:12%;animation-duration:16s;animation-delay:-2s;}
-    @keyframes flt{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(-20px) rotate(180deg);}}
+    .s1{width:110px;height:110px;background:#fff;top:4%;left:4%;animation-duration:14s;}
+    .s2{width:75px;height:75px;background:#ffd966;top:18%;right:7%;animation-duration:10s;animation-delay:-4s;}
+    .s3{width:90px;height:90px;background:#fff;bottom:8%;left:9%;animation-duration:12s;animation-delay:-7s;}
+    .s4{width:60px;height:60px;background:#ffd966;bottom:22%;right:11%;animation-duration:16s;animation-delay:-2s;}
+    @keyframes flt{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(-22px) rotate(180deg);}}
 
-    /* card */
-    .card{
-      background:white;
-      border-radius:28px;
-      padding:48px 40px 40px;
-      width:100%;max-width:420px;
-      box-shadow:0 20px 60px rgba(0,0,0,.2);
-      position:relative;z-index:5;
-      animation:slideUp .5s cubic-bezier(.34,1.56,.64,1);
-    }
+    .card{background:white;border-radius:28px;padding:44px 38px 36px;width:100%;max-width:400px;
+      box-shadow:0 24px 64px rgba(0,0,0,.22);position:relative;z-index:5;
+      animation:slideUp .5s cubic-bezier(.34,1.56,.64,1);}
     @keyframes slideUp{from{opacity:0;transform:translateY(40px);}to{opacity:1;transform:translateY(0);}}
 
-    .logo{text-align:center;margin-bottom:32px;}
-    .logo-icon{
-      width:72px;height:72px;
+    .logo{text-align:center;margin-bottom:28px;}
+    .logo-icon{width:74px;height:74px;
       background:linear-gradient(135deg,#6ec6f5,#a78bfa);
-      border-radius:20px;
-      display:inline-flex;align-items:center;justify-content:center;
-      font-size:36px;margin-bottom:12px;
-      box-shadow:0 8px 24px rgba(110,198,245,.4);
-    }
-    .logo-text{
-      font-family:var(--f-head);font-size:32px;font-weight:800;
+      border-radius:22px;display:inline-flex;align-items:center;justify-content:center;
+      font-size:38px;margin-bottom:10px;box-shadow:0 8px 24px rgba(110,198,245,.4);}
+    .logo-text{font-family:var(--fh);font-size:34px;font-weight:800;
       background:linear-gradient(135deg,#6ec6f5,#a78bfa,#ff6b6b);
-      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-      background-clip:text;
-    }
-    .logo-sub{font-size:14px;color:#94a3b8;font-weight:600;margin-top:4px;}
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+    .logo-sub{font-size:14px;color:#94a3b8;font-weight:700;margin-top:5px;}
 
-    /* lang switcher */
-    .lang-row{display:flex;justify-content:center;gap:8px;margin-bottom:28px;}
-    .lang-btn{
-      background:#f1f5f9;border:2px solid #e2e8f0;border-radius:10px;
-      padding:5px 12px;font-family:var(--f-ui);font-size:13px;font-weight:700;
-      color:#64748b;cursor:pointer;transition:all .18s;
-      display:flex;align-items:center;gap:4px;
-    }
+    .lang-row{display:flex;justify-content:center;gap:7px;margin-bottom:26px;}
+    .lang-btn{background:#f1f5f9;border:2px solid #e2e8f0;border-radius:10px;
+      padding:5px 12px;font-family:var(--fu);font-size:13px;font-weight:800;
+      color:#64748b;cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:4px;}
     .lang-btn.active{background:white;color:#7c3aed;border-color:#a78bfa;box-shadow:0 2px 8px rgba(167,139,250,.3);}
     .lang-btn:hover:not(.active){background:#e2e8f0;}
 
-    /* tabs */
-    .tabs{display:flex;background:#f8fafc;border-radius:14px;padding:4px;margin-bottom:24px;}
-    .tab{
-      flex:1;padding:10px;border:none;background:transparent;
-      font-family:var(--f-head);font-size:16px;font-weight:700;
-      color:#94a3b8;cursor:pointer;border-radius:10px;transition:all .18s;
-    }
-    .tab.active{background:white;color:#1e293b;box-shadow:0 2px 8px rgba(0,0,0,.08);}
+    .form-title{font-family:var(--fh);font-size:20px;font-weight:800;color:#1e293b;
+      text-align:center;margin-bottom:22px;}
 
-    /* form */
-    .form-group{margin-bottom:18px;}
-    label{display:block;font-weight:700;font-size:14px;color:#475569;margin-bottom:6px;}
-    input{
-      width:100%;padding:13px 16px;border:2px solid #e2e8f0;border-radius:14px;
-      font-family:var(--f-ui);font-size:15px;color:#1e293b;
-      outline:none;transition:border-color .18s;background:#fafbfd;
-    }
+    .form-group{margin-bottom:16px;}
+    label{display:block;font-weight:800;font-size:13px;color:#475569;margin-bottom:6px;}
+    input{width:100%;padding:13px 16px;border:2px solid #e2e8f0;border-radius:14px;
+      font-family:var(--fu);font-size:15px;color:#1e293b;outline:none;
+      transition:border-color .18s;background:#fafbfd;}
     input:focus{border-color:#a78bfa;background:white;}
     input::placeholder{color:#cbd5e1;}
 
-    .btn-submit{
-      width:100%;padding:14px;border:none;border-radius:14px;
+    .btn-submit{width:100%;padding:14px;border:none;border-radius:14px;
       background:linear-gradient(135deg,#6ec6f5,#a78bfa);
-      color:white;font-family:var(--f-head);font-size:18px;font-weight:700;
-      cursor:pointer;transition:all .2s;margin-top:4px;
-      box-shadow:0 4px 16px rgba(167,139,250,.4);
-    }
+      color:white;font-family:var(--fh);font-size:18px;font-weight:800;
+      cursor:pointer;transition:all .2s;margin-top:6px;
+      box-shadow:0 4px 16px rgba(167,139,250,.4);}
     .btn-submit:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(167,139,250,.5);}
     .btn-submit:active{transform:scale(.98);}
     .btn-submit:disabled{opacity:.6;cursor:not-allowed;transform:none;}
 
-    .error-msg{
-      background:#fff0f0;border:2px solid #fecaca;color:#dc2626;
-      border-radius:12px;padding:12px 16px;font-size:14px;font-weight:600;
-      margin-bottom:16px;display:none;
-    }
-    .error-msg.show{display:block;}
+    .alert{border-radius:12px;padding:12px 16px;font-size:14px;font-weight:700;
+      margin-bottom:16px;display:none;}
+    .alert.show{display:block;}
+    .alert-error{background:#fff0f0;border:2px solid #fecaca;color:#dc2626;}
+    .alert-info{background:#f0fdf4;border:2px solid #bbf7d0;color:#16a34a;}
 
-    .footer-note{text-align:center;margin-top:20px;font-size:13px;color:#94a3b8;font-weight:600;}
-
-    /* spinner */
-    .spinner{display:inline-block;width:18px;height:18px;border:3px solid rgba(255,255,255,.4);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px;}
+    .spinner{display:inline-block;width:18px;height:18px;
+      border:3px solid rgba(255,255,255,.4);border-top-color:white;
+      border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px;}
     @keyframes spin{to{transform:rotate(360deg);}}
+
+    .footer{text-align:center;margin-top:18px;font-size:12px;color:#94a3b8;font-weight:600;}
   </style>
 </head>
 <body>
-
-<div class="shape s1"></div>
-<div class="shape s2"></div>
-<div class="shape s3"></div>
-<div class="shape s4"></div>
+<div class="shape s1"></div><div class="shape s2"></div>
+<div class="shape s3"></div><div class="shape s4"></div>
 
 <div class="card">
-  <!-- LOGO -->
   <div class="logo">
     <div class="logo-icon">🚀</div>
     <div class="logo-text">KodLand</div>
     <div class="logo-sub" id="logo-sub">Öyrən • Yaz • Kəşf Et</div>
   </div>
 
-  <!-- LANG -->
   <div class="lang-row">
     <button class="lang-btn active" onclick="setLang('az')" id="btn-az">🇦🇿 AZ</button>
     <button class="lang-btn"        onclick="setLang('en')" id="btn-en">🇬🇧 EN</button>
     <button class="lang-btn"        onclick="setLang('ru')" id="btn-ru">🇷🇺 RU</button>
   </div>
 
-  <!-- TABS: login / register -->
-  <div class="tabs">
-    <button class="tab active" id="tab-login"    onclick="switchTab('login')">🔑 <span data-i18n="tabLogin">Giriş</span></button>
-    <button class="tab"        id="tab-register" onclick="switchTab('register')">✨ <span data-i18n="tabRegister">Qeydiyyat</span></button>
+  <div class="form-title" id="form-title">🔑 Daxil ol</div>
+
+  <div class="alert alert-error" id="alert-error"></div>
+  <div class="alert alert-info"  id="alert-info"></div>
+
+  <div class="form-group">
+    <label id="lbl-username">İstifadəçi adı</label>
+    <input type="text" id="inp-username" placeholder="username" autocomplete="username" autocapitalize="none"/>
+  </div>
+  <div class="form-group">
+    <label id="lbl-password">Şifrə</label>
+    <input type="password" id="inp-password" placeholder="••••••••" autocomplete="current-password"/>
   </div>
 
-  <!-- ERROR -->
-  <div class="error-msg" id="error-msg"></div>
+  <button class="btn-submit" onclick="doLogin()" id="btn-submit">
+    <span id="btn-label">Daxil ol</span>
+  </button>
 
-  <!-- LOGIN FORM -->
-  <div id="form-login">
-    <div class="form-group">
-      <label data-i18n="labelEmail">E-poçt</label>
-      <input type="email" id="login-email" placeholder="siz@email.com" autocomplete="email"/>
-    </div>
-    <div class="form-group">
-      <label data-i18n="labelPassword">Şifrə</label>
-      <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password"/>
-    </div>
-    <button class="btn-submit" onclick="doLogin()" id="btn-login-submit">
-      <span data-i18n="btnLogin">Daxil ol</span>
-    </button>
-  </div>
-
-  <!-- REGISTER FORM -->
-  <div id="form-register" style="display:none">
-    <div class="form-group">
-      <label data-i18n="labelName">Ad</label>
-      <input type="text" id="reg-name" placeholder="Adınız"/>
-    </div>
-    <div class="form-group">
-      <label data-i18n="labelEmail">E-poçt</label>
-      <input type="email" id="reg-email" placeholder="siz@email.com" autocomplete="email"/>
-    </div>
-    <div class="form-group">
-      <label data-i18n="labelPassword">Şifrə</label>
-      <input type="password" id="reg-pass" placeholder="••••••••" autocomplete="new-password"/>
-    </div>
-    <button class="btn-submit" onclick="doRegister()" id="btn-reg-submit">
-      <span data-i18n="btnRegister">Qeydiyyat</span>
-    </button>
-  </div>
-
-  <div class="footer-note" id="footer-note">KodLand © 2025</div>
+  <div class="footer">KodLand © 2025</div>
 </div>
 
 <script>
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
 
-/* ── i18n ── */
 const T = {
-  az:{ logoSub:'Öyrən • Yaz • Kəşf Et', tabLogin:'Giriş', tabRegister:'Qeydiyyat',
-       labelEmail:'E-poçt', labelPassword:'Şifrə', labelName:'Ad',
-       btnLogin:'Daxil ol', btnRegister:'Qeydiyyat et',
-       loading:'Gözləyin...', errEmpty:'Bütün xanaları doldurun.',
-       errLogin:'E-poçt və ya şifrə yanlışdır.', errRegister:'Qeydiyyat zamanı xəta baş verdi.',
-       successReg:'Qeydiyyat uğurlu! Zəhmət olmasa e-poçtunuzu təsdiqləyin.' },
-  en:{ logoSub:'Learn • Code • Discover', tabLogin:'Login', tabRegister:'Register',
-       labelEmail:'Email', labelPassword:'Password', labelName:'Name',
-       btnLogin:'Sign In', btnRegister:'Register',
-       loading:'Please wait...', errEmpty:'Please fill in all fields.',
-       errLogin:'Incorrect email or password.', errRegister:'Registration failed.',
-       successReg:'Registered! Please check your email to confirm.' },
-  ru:{ logoSub:'Учись • Пиши • Открывай', tabLogin:'Вход', tabRegister:'Регистрация',
-       labelEmail:'E-mail', labelPassword:'Пароль', labelName:'Имя',
-       btnLogin:'Войти', btnRegister:'Зарегистрироваться',
-       loading:'Подождите...', errEmpty:'Заполните все поля.',
-       errLogin:'Неверный e-mail или пароль.', errRegister:'Ошибка регистрации.',
-       successReg:'Готово! Проверьте e-mail для подтверждения.' }
+  az:{
+    logoSub:'Öyrən • Yaz • Kəşf Et',
+    formTitle:'🔑 Daxil ol',
+    lblUsername:'İstifadəçi adı',
+    lblPassword:'Şifrə',
+    btnLabel:'Daxil ol',
+    loading:'Gözləyin...',
+    errEmpty:'İstifadəçi adı və şifrəni daxil edin.',
+    errWrong:'İstifadəçi adı və ya şifrə yanlışdır.',
+    errGeneral:'Xəta baş verdi. Yenidən cəhd edin.'
+  },
+  en:{
+    logoSub:'Learn • Code • Discover',
+    formTitle:'🔑 Sign In',
+    lblUsername:'Username',
+    lblPassword:'Password',
+    btnLabel:'Sign In',
+    loading:'Please wait...',
+    errEmpty:'Please enter username and password.',
+    errWrong:'Incorrect username or password.',
+    errGeneral:'An error occurred. Please try again.'
+  },
+  ru:{
+    logoSub:'Учись • Пиши • Открывай',
+    formTitle:'🔑 Войти',
+    lblUsername:'Имя пользователя',
+    lblPassword:'Пароль',
+    btnLabel:'Войти',
+    loading:'Подождите...',
+    errEmpty:'Введите имя пользователя и пароль.',
+    errWrong:'Неверное имя пользователя или пароль.',
+    errGeneral:'Произошла ошибка. Попробуйте снова.'
+  }
 };
 
-let lang='az', activeTab='login';
+let lang = 'az';
 
-function setLang(l){
-  lang=l;
-  ['az','en','ru'].forEach(x=>document.getElementById('btn-'+x).classList.toggle('active',x===l));
-  const t=T[l];
-  document.getElementById('logo-sub').textContent=t.logoSub;
-  document.querySelectorAll('[data-i18n]').forEach(el=>{
-    const k=el.getAttribute('data-i18n');
-    if(t[k]) el.textContent=t[k];
-  });
+function setLang(l) {
+  lang = l;
+  ['az','en','ru'].forEach(x => document.getElementById('btn-'+x).classList.toggle('active', x===l));
+  const t = T[l];
+  document.getElementById('logo-sub').textContent    = t.logoSub;
+  document.getElementById('form-title').textContent  = t.formTitle;
+  document.getElementById('lbl-username').textContent = t.lblUsername;
+  document.getElementById('lbl-password').textContent = t.lblPassword;
+  document.getElementById('btn-label').textContent   = t.btnLabel;
+  document.getElementById('inp-username').placeholder = t.lblUsername.toLowerCase();
 }
 
-function switchTab(tab){
-  activeTab=tab;
-  document.getElementById('tab-login').classList.toggle('active',tab==='login');
-  document.getElementById('tab-register').classList.toggle('active',tab==='register');
-  document.getElementById('form-login').style.display=tab==='login'?'':'none';
-  document.getElementById('form-register').style.display=tab==='register'?'':'none';
-  hideError();
+function showError(msg) {
+  const el = document.getElementById('alert-error');
+  el.textContent = msg; el.classList.add('show');
+  document.getElementById('alert-info').classList.remove('show');
+}
+function hideAlerts() {
+  document.getElementById('alert-error').classList.remove('show');
+  document.getElementById('alert-info').classList.remove('show');
 }
 
-function showError(msg){
-  const el=document.getElementById('error-msg');
-  el.textContent=msg; el.classList.add('show');
-}
-function hideError(){ document.getElementById('error-msg').classList.remove('show'); }
-
-function setLoading(btnId, loading){
-  const btn=document.getElementById(btnId);
-  btn.disabled=loading;
-  if(loading) btn.innerHTML=`<span class="spinner"></span>${T[lang].loading}`;
-  else btn.innerHTML=`<span data-i18n="${btnId==='btn-login-submit'?'btnLogin':'btnRegister'}">${T[lang][btnId==='btn-login-submit'?'btnLogin':'btnRegister']}</span>`;
+function setLoading(on) {
+  const btn = document.getElementById('btn-submit');
+  const lbl = document.getElementById('btn-label');
+  btn.disabled = on;
+  lbl.innerHTML = on ? `<span class="spinner"></span>${T[lang].loading}` : T[lang].btnLabel;
 }
 
-async function doLogin(){
-  hideError();
-  const email=document.getElementById('login-email').value.trim();
-  const pass=document.getElementById('login-pass').value;
-  if(!email||!pass){showError(T[lang].errEmpty);return;}
-  setLoading('btn-login-submit',true);
-  const {data,error}=await sb.auth.signInWithPassword({email,password:pass});
-  setLoading('btn-login-submit',false);
-  if(error){showError(T[lang].errLogin);return;}
-  // check if admin
-  const {data:profile}=await sb.from('profiles').select('role').eq('id',data.user.id).single();
-  if(profile?.role==='admin') window.location.href='admin.html';
-  else window.location.href='editor.html';
+async function doLogin() {
+  hideAlerts();
+  const username = document.getElementById('inp-username').value.trim().toLowerCase();
+  const password = document.getElementById('inp-password').value;
+  if (!username || !password) { showError(T[lang].errEmpty); return; }
+
+  setLoading(true);
+  // username → fake email format
+  const email = username + DOMAIN_SUFFIX;
+
+  const { data, error } = await sb.auth.signInWithPassword({ email, password });
+  setLoading(false);
+
+  if (error) { showError(T[lang].errWrong); return; }
+
+  // check role → redirect
+  const { data: profile } = await sb.from('profiles')
+    .select('role').eq('id', data.user.id).single();
+
+  window.location.href = profile?.role === 'admin' ? 'admin.html' : 'editor.html';
 }
 
-async function doRegister(){
-  hideError();
-  const name=document.getElementById('reg-name').value.trim();
-  const email=document.getElementById('reg-email').value.trim();
-  const pass=document.getElementById('reg-pass').value;
-  if(!name||!email||!pass){showError(T[lang].errEmpty);return;}
-  setLoading('btn-reg-submit',true);
-  const {data,error}=await sb.auth.signUp({email,password:pass,options:{data:{full_name:name}}});
-  setLoading('btn-reg-submit',false);
-  if(error){showError(T[lang].errRegister);return;}
-  showError(T[lang].successReg);
-  document.getElementById('error-msg').style.background='#f0fdf4';
-  document.getElementById('error-msg').style.borderColor='#bbf7d0';
-  document.getElementById('error-msg').style.color='#16a34a';
-}
-
-// already logged in → redirect
-(async()=>{
-  const {data}=await sb.auth.getSession();
-  if(data.session){
-    const {data:profile}=await sb.from('profiles').select('role').eq('id',data.session.user.id).single();
-    window.location.href=profile?.role==='admin'?'admin.html':'editor.html';
+// already logged in?
+(async () => {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) {
+    const { data: profile } = await sb.from('profiles')
+      .select('role').eq('id', session.user.id).single();
+    window.location.href = profile?.role === 'admin' ? 'admin.html' : 'editor.html';
   }
 })();
 
-setLang('az');
-
 // Enter key
-document.addEventListener('keydown',e=>{
-  if(e.key==='Enter'){
-    if(activeTab==='login') doLogin();
-    else doRegister();
-  }
-});
+document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+setLang('az');
 </script>
 </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>KodLand 🛡️ — Admin Panel</title>
+  <title>KodLand 🛡️ — Admin</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
@@ -11,341 +11,588 @@
   <script src="supabase-config.js"></script>
   <style>
     :root{
-      --f-ui:'Nunito',sans-serif;--f-head:'Baloo 2',sans-serif;
+      --fh:'Baloo 2',sans-serif;--fu:'Nunito',sans-serif;
       --bg:#f8fafc;--card:#fff;--text:#1e293b;--sub:#64748b;
       --border:#e2e8f0;--shadow:0 4px 20px rgba(0,0,0,.08);--radius:16px;
-      --purple:#7c3aed;--red:#dc2626;--green:#16a34a;--blue:#2563eb;
     }
     *{box-sizing:border-box;margin:0;padding:0;}
-    body{font-family:var(--f-ui);background:var(--bg);color:var(--text);min-height:100vh;}
+    body{font-family:var(--fu);background:var(--bg);color:var(--text);min-height:100vh;}
 
     /* HEADER */
-    header{background:linear-gradient(135deg,#1e293b,#334155);height:64px;padding:0 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 4px 16px rgba(0,0,0,.2);}
+    header{background:linear-gradient(135deg,#1e293b,#334155);height:64px;padding:0 22px;
+      display:flex;align-items:center;justify-content:space-between;gap:12px;
+      box-shadow:0 4px 16px rgba(0,0,0,.2);}
     .logo{display:flex;align-items:center;gap:10px;}
-    .logo-icon{width:40px;height:40px;background:linear-gradient(135deg,#6ec6f5,#a78bfa);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;}
-    .logo-text{font-family:var(--f-head);font-size:22px;font-weight:800;color:white;}
-    .logo-badge{background:#7c3aed;color:white;border-radius:8px;padding:3px 10px;font-size:12px;font-weight:800;letter-spacing:.5px;}
-    .btn-hdr{background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.2);border-radius:9px;padding:6px 14px;cursor:pointer;font-family:var(--f-ui);font-size:13px;font-weight:700;color:white;transition:all .18s;}
+    .logo-icon{width:40px;height:40px;background:linear-gradient(135deg,#6ec6f5,#a78bfa);
+      border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;}
+    .logo-text{font-family:var(--fh);font-size:22px;font-weight:800;color:white;}
+    .logo-badge{background:#7c3aed;color:white;border-radius:8px;padding:3px 10px;font-size:12px;font-weight:800;}
+    .hdr-btns{display:flex;gap:8px;}
+    .btn-hdr{background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.2);
+      border-radius:9px;padding:6px 14px;cursor:pointer;font-family:var(--fu);
+      font-size:13px;font-weight:700;color:white;transition:all .18s;}
     .btn-hdr:hover{background:rgba(255,255,255,.2);}
     .btn-hdr-edit{background:rgba(110,198,245,.15);border-color:rgba(110,198,245,.4);}
 
-    /* MAIN */
-    main{max-width:1200px;margin:0 auto;padding:28px 20px 48px;}
+    main{max-width:1280px;margin:0 auto;padding:26px 18px 60px;}
 
-    h2.section-title{font-family:var(--f-head);font-size:22px;font-weight:800;color:var(--text);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+    /* STATS */
+    .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:13px;margin-bottom:28px;}
+    .stat-card{background:var(--card);border-radius:var(--radius);padding:18px;
+      border:2px solid var(--border);box-shadow:var(--shadow);text-align:center;}
+    .stat-icon{font-size:30px;margin-bottom:5px;}
+    .stat-num{font-family:var(--fh);font-size:30px;font-weight:800;}
+    .stat-label{font-size:12px;font-weight:700;color:var(--sub);margin-top:2px;}
 
-    /* STATS ROW */
-    .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:32px;}
-    .stat-card{background:var(--card);border-radius:var(--radius);padding:20px;border:2px solid var(--border);box-shadow:var(--shadow);text-align:center;}
-    .stat-icon{font-size:32px;margin-bottom:6px;}
-    .stat-num{font-family:var(--f-head);font-size:32px;font-weight:800;color:var(--text);}
-    .stat-label{font-size:13px;font-weight:700;color:var(--sub);margin-top:2px;}
+    /* SECTION TABS */
+    .sec-tabs{display:flex;gap:4px;margin-bottom:20px;background:#f1f5f9;
+      border-radius:14px;padding:4px;width:fit-content;}
+    .sec-tab{padding:9px 18px;border:none;background:transparent;
+      font-family:var(--fh);font-size:15px;font-weight:700;color:var(--sub);
+      cursor:pointer;border-radius:10px;transition:all .18s;}
+    .sec-tab.active{background:white;color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.08);}
 
-    /* ADD USER CARD */
-    .card{background:var(--card);border-radius:var(--radius);border:2px solid var(--border);box-shadow:var(--shadow);padding:24px;margin-bottom:24px;}
-    .form-row{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:12px;align-items:end;}
-    @media(max-width:700px){.form-row{grid-template-columns:1fr;}}
-    .form-group label{display:block;font-weight:700;font-size:13px;color:var(--sub);margin-bottom:5px;}
-    input,select{width:100%;padding:11px 14px;border:2px solid var(--border);border-radius:12px;font-family:var(--f-ui);font-size:14px;color:var(--text);outline:none;transition:border-color .18s;background:#fafbfd;}
+    .section-title{font-family:var(--fh);font-size:20px;font-weight:800;
+      color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+
+    /* CARD */
+    .card{background:var(--card);border-radius:var(--radius);border:2px solid var(--border);
+      box-shadow:var(--shadow);padding:22px;margin-bottom:22px;}
+
+    .form-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:11px;align-items:end;}
+    @media(max-width:800px){.form-grid{grid-template-columns:1fr 1fr;}}
+    @media(max-width:500px){.form-grid{grid-template-columns:1fr;}}
+
+    .fg label{display:block;font-weight:800;font-size:13px;color:var(--sub);margin-bottom:5px;}
+    input,select{width:100%;padding:10px 13px;border:2px solid var(--border);border-radius:12px;
+      font-family:var(--fu);font-size:14px;color:var(--text);outline:none;
+      transition:border-color .18s;background:#fafbfd;}
     input:focus,select:focus{border-color:#a78bfa;background:white;}
 
-    .btn{border:none;border-radius:11px;font-family:var(--f-head);font-size:15px;font-weight:700;cursor:pointer;transition:all .18s;display:inline-flex;align-items:center;gap:6px;padding:10px 20px;white-space:nowrap;}
-    .btn-primary{background:linear-gradient(135deg,#6ec6f5,#a78bfa);color:white;box-shadow:0 4px 14px rgba(167,139,250,.35);}
+    /* BUTTONS */
+    .btn{border:none;border-radius:11px;font-family:var(--fh);font-size:14px;font-weight:700;
+      cursor:pointer;transition:all .18s;display:inline-flex;align-items:center;gap:5px;padding:9px 18px;}
+    .btn-primary{background:linear-gradient(135deg,#6ec6f5,#a78bfa);color:white;
+      box-shadow:0 4px 14px rgba(167,139,250,.35);}
     .btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(167,139,250,.45);}
-    .btn-danger{background:#fff0f0;color:var(--red);border:2px solid #fecaca;}
+    .btn-primary:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+    .btn-danger{background:#fff0f0;color:#dc2626;border:2px solid #fecaca;}
     .btn-danger:hover{background:#fecaca;}
-    .btn-sm{font-size:13px;padding:7px 14px;}
-    .btn-success{background:#f0fdf4;color:var(--green);border:2px solid #bbf7d0;}
-    .btn-success:hover{background:#dcfce7;}
+    .btn-sm{font-size:12px;padding:6px 12px;}
+    .btn-view{background:#eff6ff;color:#2563eb;border:2px solid #bfdbfe;}
+    .btn-view:hover{background:#dbeafe;}
 
-    /* USER TABLE */
+    /* TABLE */
     .table-wrap{overflow-x:auto;border-radius:var(--radius);border:2px solid var(--border);}
     table{width:100%;border-collapse:collapse;background:var(--card);}
     thead{background:linear-gradient(90deg,#f8fafc,#f1f5f9);}
-    th{padding:13px 16px;text-align:left;font-family:var(--f-head);font-size:14px;font-weight:700;color:var(--sub);border-bottom:2px solid var(--border);}
-    td{padding:13px 16px;border-bottom:1px solid var(--border);font-size:14px;font-weight:600;}
+    th{padding:12px 14px;text-align:left;font-family:var(--fh);font-size:13px;
+      font-weight:700;color:var(--sub);border-bottom:2px solid var(--border);}
+    td{padding:12px 14px;border-bottom:1px solid var(--border);font-size:13px;font-weight:600;}
     tr:last-child td{border-bottom:none;}
     tr:hover td{background:#f8fafc;}
 
-    .role-badge{display:inline-block;border-radius:8px;padding:3px 10px;font-size:12px;font-weight:800;}
+    .role-badge{display:inline-block;border-radius:8px;padding:3px 9px;font-size:11px;font-weight:800;}
     .role-admin{background:#ede9fe;color:#7c3aed;}
     .role-user{background:#ecfdf5;color:#059669;}
 
-    /* ARCHIVE TABLE */
-    .archive-code{font-family:monospace;font-size:12px;color:#475569;background:#f1f5f9;border-radius:6px;padding:4px 8px;max-width:250px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;}
+    .code-preview{font-family:monospace;font-size:11px;color:#475569;background:#f1f5f9;
+      border-radius:6px;padding:3px 7px;max-width:200px;overflow:hidden;
+      text-overflow:ellipsis;white-space:nowrap;display:inline-block;vertical-align:middle;}
 
-    /* TABS */
-    .admin-tabs{display:flex;gap:4px;margin-bottom:20px;background:#f1f5f9;border-radius:14px;padding:4px;width:fit-content;}
-    .admin-tab{padding:9px 20px;border:none;background:transparent;font-family:var(--f-head);font-size:15px;font-weight:700;color:var(--sub);cursor:pointer;border-radius:10px;transition:all .18s;}
-    .admin-tab.active{background:white;color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.08);}
+    /* SCORE STARS */
+    .score-display{font-size:16px;letter-spacing:1px;}
+    .score-num{font-family:var(--fh);font-size:13px;font-weight:800;color:#475569;margin-left:4px;}
+    .score-avg-badge{display:inline-flex;align-items:center;gap:4px;background:#fef9c3;
+      border:2px solid #fde68a;border-radius:10px;padding:3px 10px;
+      font-family:var(--fh);font-size:13px;font-weight:800;color:#92400e;}
+
+    /* STAR RATING input */
+    .star-rating{display:flex;gap:4px;align-items:center;}
+    .star-btn{background:none;border:none;font-size:22px;cursor:pointer;
+      opacity:.3;transition:opacity .15s;padding:0;}
+    .star-btn.on{opacity:1;}
+    .star-btn:hover{opacity:.8;}
+
+    /* CODE MODAL */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;
+      display:none;align-items:center;justify-content:center;padding:20px;}
+    .modal-overlay.open{display:flex;}
+    .modal{background:white;border-radius:20px;width:100%;max-width:900px;
+      max-height:92vh;display:flex;flex-direction:column;
+      box-shadow:0 24px 64px rgba(0,0,0,.3);}
+    .modal-hdr{padding:18px 20px;border-bottom:2px solid var(--border);
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
+      background:linear-gradient(90deg,#f8fafc,#f1f5f9);border-radius:20px 20px 0 0;}
+    .modal-title{font-family:var(--fh);font-size:18px;font-weight:800;}
+    .modal-close{background:none;border:none;font-size:22px;cursor:pointer;color:var(--sub);}
+    .modal-body{flex:1;overflow:auto;padding:0;display:flex;flex-direction:column;}
+
+    .modal-tabs{display:flex;border-bottom:2px solid var(--border);background:#f8fafc;}
+    .modal-tab{flex:1;padding:10px;border:none;background:transparent;
+      font-family:var(--fh);font-size:14px;font-weight:700;color:var(--sub);
+      cursor:pointer;border-bottom:3px solid transparent;transition:all .2s;}
+    .modal-tab.active{color:var(--text);background:white;border-bottom-color:#6ec6f5;}
+
+    .modal-preview{flex:1;border:none;width:100%;min-height:380px;background:white;display:block;}
+    .modal-code{flex:1;padding:16px;font-family:monospace;font-size:13px;
+      color:#1e293b;background:#fafbfd;overflow:auto;min-height:380px;
+      white-space:pre-wrap;word-break:break-all;line-height:1.7;}
+
+    /* scoring in modal */
+    .modal-score-bar{padding:14px 20px;border-top:2px solid var(--border);
+      background:#f8fafc;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+    .score-label{font-family:var(--fh);font-size:15px;font-weight:800;}
+    .btn-save-score{background:linear-gradient(135deg,#22c55e,#16a34a);color:white;
+      box-shadow:0 3px 10px rgba(34,197,94,.35);}
+    .btn-save-score:hover{transform:translateY(-1px);}
+    .saved-score{font-family:var(--fh);font-size:14px;color:#16a34a;font-weight:800;}
+
+    /* search */
+    .search-row{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center;}
+    .search-inp{max-width:260px;padding:9px 14px;}
 
     /* toast */
-    .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:#1e293b;color:white;padding:11px 22px;border-radius:28px;font-family:var(--f-head);font-size:15px;opacity:0;transition:all .35s cubic-bezier(.34,1.56,.64,1);z-index:999;pointer-events:none;display:flex;align-items:center;gap:7px;}
+    .toast{position:fixed;bottom:26px;left:50%;
+      transform:translateX(-50%) translateY(80px);background:#1e293b;color:white;
+      padding:11px 22px;border-radius:28px;font-family:var(--fh);font-size:15px;
+      opacity:0;transition:all .35s cubic-bezier(.34,1.56,.64,1);
+      z-index:999;pointer-events:none;display:flex;align-items:center;gap:7px;}
     .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
-    .spinner{display:inline-block;width:16px;height:16px;border:3px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;}
+    .spinner{display:inline-block;width:14px;height:14px;
+      border:3px solid rgba(255,255,255,.3);border-top-color:white;
+      border-radius:50%;animation:spin .7s linear infinite;}
     @keyframes spin{to{transform:rotate(360deg);}}
-    .loading-row td{text-align:center;padding:30px;color:var(--sub);}
+    .empty-row td{text-align:center;padding:28px;color:var(--sub);}
+    .err-msg{color:#dc2626;font-size:13px;font-weight:700;margin-top:8px;display:none;}
+    .err-msg.show{display:block;}
   </style>
 </head>
 <body>
 
-<!-- HEADER -->
 <header>
   <div class="logo">
     <div class="logo-icon">🛡️</div>
     <div class="logo-text">KodLand</div>
     <div class="logo-badge">ADMIN</div>
   </div>
-  <div style="display:flex;gap:8px;">
-    <button class="btn-hdr btn-hdr-edit" onclick="window.location.href='editor.html'">✏️ Redaktor</button>
+  <div class="hdr-btns">
+    <button class="btn-hdr btn-hdr-edit" onclick="location.href='editor.html'">✏️ Redaktor</button>
     <button class="btn-hdr" onclick="doLogout()">🚪 Çıx</button>
   </div>
 </header>
 
-<!-- MAIN -->
 <main>
   <!-- STATS -->
-  <div class="stats" id="stats-row">
-    <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-num" id="stat-users">—</div><div class="stat-label">İstifadəçi</div></div>
-    <div class="stat-card"><div class="stat-icon">💾</div><div class="stat-num" id="stat-runs">—</div><div class="stat-label">Saxlanılmış Kod</div></div>
-    <div class="stat-card"><div class="stat-icon">⭐</div><div class="stat-num" id="stat-today">—</div><div class="stat-label">Bu gün</div></div>
+  <div class="stats">
+    <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-num" id="s-users">—</div><div class="stat-label">İstifadəçi</div></div>
+    <div class="stat-card"><div class="stat-icon">💾</div><div class="stat-num" id="s-runs">—</div><div class="stat-label">Saxlanılmış Kod</div></div>
+    <div class="stat-card"><div class="stat-icon">⭐</div><div class="stat-num" id="s-today">—</div><div class="stat-label">Bu gün</div></div>
+    <div class="stat-card"><div class="stat-icon">📊</div><div class="stat-num" id="s-scored">—</div><div class="stat-label">Qiymətləndirilmiş</div></div>
   </div>
 
-  <!-- TABS -->
-  <div class="admin-tabs">
-    <button class="admin-tab active" onclick="showSection('users')">👥 İstifadəçilər</button>
-    <button class="admin-tab"        onclick="showSection('archive')">📂 Arxiv</button>
+  <!-- SECTION TABS -->
+  <div class="sec-tabs">
+    <button class="sec-tab active" onclick="showSection('users')">👥 İstifadəçilər</button>
+    <button class="sec-tab"        onclick="showSection('archive')">📂 Arxiv & Qiymət</button>
   </div>
 
-  <!-- USERS SECTION -->
-  <div id="section-users">
-    <h2 class="section-title">👥 İstifadəçi Əlavə Et</h2>
+  <!-- USERS -->
+  <div id="sec-users">
+    <div class="section-title">➕ Yeni İstifadəçi</div>
     <div class="card">
-      <div class="form-row">
-        <div class="form-group">
-          <label>Ad Soyad</label>
-          <input type="text" id="new-name" placeholder="Ad Soyad"/>
+      <div class="form-grid">
+        <div class="fg"><label>Ad Soyad</label><input type="text" id="u-name" placeholder="Tural Məmmədov"/></div>
+        <div class="fg"><label>İstifadəçi adı</label><input type="text" id="u-username" placeholder="tural123" autocapitalize="none"/></div>
+        <div class="fg"><label>Şifrə</label><input type="password" id="u-pass" placeholder="minimum 6 simvol"/></div>
+        <div class="fg"><label>Rol</label>
+          <select id="u-role"><option value="user">Şagird</option><option value="admin">Admin</option></select>
         </div>
-        <div class="form-group">
-          <label>E-poçt</label>
-          <input type="email" id="new-email" placeholder="email@example.com"/>
-        </div>
-        <div class="form-group">
-          <label>Şifrə</label>
-          <input type="password" id="new-pass" placeholder="Şifrə"/>
-        </div>
-        <div class="form-group">
-          <label>Rol</label>
-          <select id="new-role">
-            <option value="user">İstifadəçi</option>
-            <option value="admin">Admin</option>
-          </select>
+        <div class="fg"><label>&nbsp;</label>
+          <button class="btn btn-primary" onclick="addUser()" id="btn-add">➕ Əlavə et</button>
         </div>
       </div>
-      <div style="margin-top:14px;display:flex;gap:10px;align-items:center;">
-        <button class="btn btn-primary" onclick="addUser()" id="btn-add-user">➕ İstifadəçi Əlavə Et</button>
-        <div id="add-error" style="font-size:13px;font-weight:700;color:#dc2626;display:none;"></div>
-      </div>
+      <div class="err-msg" id="add-err"></div>
     </div>
 
-    <h2 class="section-title">👥 Bütün İstifadəçilər</h2>
+    <div class="section-title">👥 Bütün İstifadəçilər</div>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>#</th><th>Ad</th><th>E-poçt</th><th>Rol</th><th>Qeydiyyat</th><th>Əməliyyat</th></tr></thead>
-        <tbody id="users-tbody"><tr class="loading-row"><td colspan="6">Yüklənir...</td></tr></tbody>
+        <thead><tr><th>#</th><th>Ad Soyad</th><th>İstifadəçi adı</th><th>Rol</th><th>Qeydiyyat</th><th>Ortalama Bal</th><th>Əməliyyat</th></tr></thead>
+        <tbody id="users-tb"><tr class="empty-row"><td colspan="7">Yüklənir...</td></tr></tbody>
       </table>
     </div>
   </div>
 
-  <!-- ARCHIVE SECTION -->
-  <div id="section-archive" style="display:none">
-    <h2 class="section-title">📂 Bütün Saxlanılmış Kodlar</h2>
-    <div style="margin-bottom:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-      <input type="text" id="archive-search" placeholder="🔍 İstifadəçi adı axtar..." style="max-width:280px;" oninput="filterArchive()"/>
+  <!-- ARCHIVE -->
+  <div id="sec-archive" style="display:none">
+    <div class="section-title">📂 Arxiv — Bütün Kodlar</div>
+    <div class="search-row">
+      <input class="search-inp" type="text" id="arc-search" placeholder="🔍 İstifadəçi axtar..." oninput="filterArchive()"/>
+      <select id="arc-filter" onchange="filterArchive()" style="max-width:180px;">
+        <option value="all">Bütün kodlar</option>
+        <option value="unscored">Yalnız qiymətləndirilməmiş</option>
+        <option value="scored">Yalnız qiymətləndirilmiş</option>
+      </select>
     </div>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>#</th><th>İstifadəçi</th><th>Tarix / Saat</th><th>Dil</th><th>Tab</th><th>HTML Kod</th><th>Əməliyyat</th></tr></thead>
-        <tbody id="archive-tbody"><tr class="loading-row"><td colspan="7">Yüklənir...</td></tr></tbody>
+        <thead><tr><th>#</th><th>Şagird</th><th>Tarix / Saat</th><th>Kod</th><th>Bal</th><th>Ortalama</th><th>Əməliyyat</th></tr></thead>
+        <tbody id="arc-tb"><tr class="empty-row"><td colspan="7">Yüklənir...</td></tr></tbody>
       </table>
     </div>
   </div>
 </main>
 
-<div class="toast" id="toast"><span id="toast-emoji">✅</span><span id="toast-msg"></span></div>
+<!-- CODE PREVIEW MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-hdr">
+      <div class="modal-title" id="modal-title">Kodun Nəticəsi</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-tabs">
+        <button class="modal-tab active" onclick="switchModalTab('preview')" id="mtab-preview">👁️ Nəticə</button>
+        <button class="modal-tab"        onclick="switchModalTab('code')"    id="mtab-code">📝 Kod</button>
+      </div>
+      <iframe class="modal-preview" id="modal-frame" sandbox="allow-scripts allow-same-origin"></iframe>
+      <div class="modal-code" id="modal-code" style="display:none"></div>
+    </div>
+    <div class="modal-score-bar">
+      <span class="score-label">Qiymət:</span>
+      <div class="star-rating" id="star-rating">
+        <button class="star-btn" data-v="1" onclick="selectStar(1)">⭐</button>
+        <button class="star-btn" data-v="2" onclick="selectStar(2)">⭐</button>
+        <button class="star-btn" data-v="3" onclick="selectStar(3)">⭐</button>
+        <button class="star-btn" data-v="4" onclick="selectStar(4)">⭐</button>
+        <button class="star-btn" data-v="5" onclick="selectStar(5)">⭐</button>
+      </div>
+      <span id="selected-score-label" style="font-family:var(--fh);font-size:14px;font-weight:800;color:#475569;min-width:40px;"></span>
+      <button class="btn btn-save-score" onclick="saveScore()" id="btn-save-score">💾 Qiymət Ver</button>
+      <span class="saved-score" id="saved-score-display" style="display:none"></span>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span id="t-emoji">✅</span><span id="t-msg"></span></div>
 
 <script>
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
 
-let currentAdmin=null;
-let allArchive=[];
+let currentAdmin = null;
+let allArchive   = [];
+let modalItemId  = null;
+let selectedScore = 0;
+let modalTab     = 'preview';
 
-/* ── AUTH GUARD (admin only) ── */
+/* ── AUTH ── */
 (async()=>{
-  const {data:{session}}=await sb.auth.getSession();
-  if(!session){window.location.href='index.html';return;}
-  const {data:profile}=await sb.from('profiles').select('role').eq('id',session.user.id).single();
-  if(profile?.role!=='admin'){window.location.href='editor.html';return;}
-  currentAdmin=session.user;
-  loadStats();
-  loadUsers();
+  const {data:{session}} = await sb.auth.getSession();
+  if(!session){location.href='index.html';return;}
+  const {data:prof} = await sb.from('profiles').select('role').eq('id',session.user.id).single();
+  if(prof?.role!=='admin'){location.href='editor.html';return;}
+  currentAdmin = session.user;
+  loadStats(); loadUsers();
 })();
 
-async function doLogout(){
-  await sb.auth.signOut();
-  window.location.href='index.html';
-}
+async function doLogout(){await sb.auth.signOut();location.href='index.html';}
 
 /* ── SECTION SWITCH ── */
 function showSection(sec){
-  document.getElementById('section-users').style.display=sec==='users'?'':'none';
-  document.getElementById('section-archive').style.display=sec==='archive'?'':'none';
-  document.querySelectorAll('.admin-tab').forEach((t,i)=>t.classList.toggle('active',(sec==='users'&&i===0)||(sec==='archive'&&i===1)));
+  document.getElementById('sec-users').style.display   = sec==='users'   ? '' : 'none';
+  document.getElementById('sec-archive').style.display = sec==='archive' ? '' : 'none';
+  document.querySelectorAll('.sec-tab').forEach((t,i)=>{
+    t.classList.toggle('active',(sec==='users'&&i===0)||(sec==='archive'&&i===1));});
   if(sec==='archive') loadArchive();
 }
 
 /* ── STATS ── */
 async function loadStats(){
-  const [{count:uc},{count:rc},{count:tc}]=await Promise.all([
+  const today = new Date().toISOString().split('T')[0];
+  const [u,r,d,sc]=await Promise.all([
     sb.from('profiles').select('*',{count:'exact',head:true}),
     sb.from('code_archive').select('*',{count:'exact',head:true}),
-    sb.from('code_archive').select('*',{count:'exact',head:true}).gte('created_at',new Date().toISOString().split('T')[0])
+    sb.from('code_archive').select('*',{count:'exact',head:true}).gte('created_at',today),
+    sb.from('code_archive').select('*',{count:'exact',head:true}).not('score','is',null)
   ]);
-  document.getElementById('stat-users').textContent=uc??0;
-  document.getElementById('stat-runs').textContent=rc??0;
-  document.getElementById('stat-today').textContent=tc??0;
+  document.getElementById('s-users').textContent  = u.count??0;
+  document.getElementById('s-runs').textContent   = r.count??0;
+  document.getElementById('s-today').textContent  = d.count??0;
+  document.getElementById('s-scored').textContent = sc.count??0;
 }
 
 /* ── USERS ── */
 async function loadUsers(){
-  const tbody=document.getElementById('users-tbody');
+  const tb=document.getElementById('users-tb');
   const {data,error}=await sb.from('profiles').select('*').order('created_at',{ascending:false});
-  if(error||!data){tbody.innerHTML='<tr class="loading-row"><td colspan="6">Xəta baş verdi</td></tr>';return;}
-  if(data.length===0){tbody.innerHTML='<tr class="loading-row"><td colspan="6">İstifadəçi yoxdur</td></tr>';return;}
-  tbody.innerHTML='';
+  if(error||!data){tb.innerHTML='<tr class="empty-row"><td colspan="7">Xəta baş verdi</td></tr>';return;}
+  if(!data.length){tb.innerHTML='<tr class="empty-row"><td colspan="7">İstifadəçi yoxdur</td></tr>';return;}
+
+  // get avg scores per user
+  const {data:scores}=await sb.from('code_archive').select('user_id,score').not('score','is',null);
+  const avgMap={};
+  if(scores){
+    const groups={};
+    scores.forEach(r=>{
+      if(!groups[r.user_id])groups[r.user_id]=[];
+      groups[r.user_id].push(r.score);
+    });
+    Object.keys(groups).forEach(uid=>{
+      const arr=groups[uid];
+      avgMap[uid]=(arr.reduce((a,b)=>a+b,0)/arr.length).toFixed(1);
+    });
+  }
+
+  tb.innerHTML='';
   data.forEach((u,i)=>{
     const date=new Date(u.created_at).toLocaleDateString('az-AZ',{day:'2-digit',month:'2-digit',year:'numeric'});
+    const uname=u.username||u.email?.split('@')[0]||'—';
+    const avg=avgMap[u.id];
+    const avgHtml=avg
+      ?`<span class="score-avg-badge">⭐ ${avg}/5</span>`
+      :'<span style="color:#cbd5e1;font-weight:700">—</span>';
     const tr=document.createElement('tr');
     tr.innerHTML=`
       <td>${i+1}</td>
-      <td><strong>${escHtml(u.full_name||'—')}</strong></td>
-      <td>${escHtml(u.email||'—')}</td>
-      <td><span class="role-badge ${u.role==='admin'?'role-admin':'role-user'}">${u.role==='admin'?'🛡️ Admin':'👤 İstifadəçi'}</span></td>
+      <td><strong>${esc(u.full_name||'—')}</strong></td>
+      <td><code>${esc(uname)}</code></td>
+      <td><span class="role-badge ${u.role==='admin'?'role-admin':'role-user'}">${u.role==='admin'?'🛡️ Admin':'👤 Şagird'}</span></td>
       <td>${date}</td>
-      <td>
-        <button class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}',this)">🗑️ Sil</button>
-      </td>`;
-    tbody.appendChild(tr);
+      <td>${avgHtml}</td>
+      <td><button class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}',this)">🗑️ Sil</button></td>`;
+    tb.appendChild(tr);
   });
 }
 
+/* ── ADD USER ── */
 async function addUser(){
-  const name=document.getElementById('new-name').value.trim();
-  const email=document.getElementById('new-email').value.trim();
-  const pass=document.getElementById('new-pass').value;
-  const role=document.getElementById('new-role').value;
-  const errEl=document.getElementById('add-error');
-  errEl.style.display='none';
+  const name     = document.getElementById('u-name').value.trim();
+  const username = document.getElementById('u-username').value.trim().toLowerCase();
+  const pass     = document.getElementById('u-pass').value;
+  const role     = document.getElementById('u-role').value;
+  const errEl    = document.getElementById('add-err');
+  errEl.classList.remove('show');
 
-  if(!name||!email||!pass){errEl.textContent='Bütün xanaları doldurun.';errEl.style.display='block';return;}
+  if(!name||!username||!pass){errEl.textContent='Bütün xanaları doldurun.';errEl.classList.add('show');return;}
+  if(pass.length<6){errEl.textContent='Şifrə minimum 6 simvol olmalıdır.';errEl.classList.add('show');return;}
+  if(!/^[a-z0-9_]+$/.test(username)){errEl.textContent='İstifadəçi adı yalnız ingilis hərfi, rəqəm və _ ola bilər.';errEl.classList.add('show');return;}
 
-  const btn=document.getElementById('btn-add-user');
+  const btn=document.getElementById('btn-add');
   btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Əlavə edilir...';
 
-  // Use admin API via Supabase Edge Function or direct signUp
-  const {data,error}=await sb.auth.admin?.createUser?.({
-    email,password:pass,
-    email_confirm:true,
-    user_metadata:{full_name:name}
-  }) ?? await sb.auth.signUp({email,password:pass,options:{data:{full_name:name}}});
+  const email = username + DOMAIN_SUFFIX;
+
+  // signUp via client (email confirm disabled in Supabase dashboard)
+  const {data,error}=await sb.auth.signUp({
+    email, password:pass,
+    options:{data:{full_name:name, username}}
+  });
 
   if(error){
-    errEl.textContent='Xəta: '+error.message;errEl.style.display='block';
-    btn.disabled=false;btn.innerHTML='➕ İstifadəçi Əlavə Et';return;
+    errEl.textContent='Xəta: '+error.message;errEl.classList.add('show');
+    btn.disabled=false;btn.innerHTML='➕ Əlavə et';return;
   }
 
-  // set role in profiles
+  // upsert profile with username + role
   if(data?.user){
-    await sb.from('profiles').upsert({id:data.user.id,email,full_name:name,role});
+    await sb.from('profiles').upsert({
+      id:data.user.id, email, full_name:name, username, role
+    });
   }
 
-  btn.disabled=false;btn.innerHTML='➕ İstifadəçi Əlavə Et';
-  document.getElementById('new-name').value='';
-  document.getElementById('new-email').value='';
-  document.getElementById('new-pass').value='';
+  btn.disabled=false;btn.innerHTML='➕ Əlavə et';
+  document.getElementById('u-name').value='';
+  document.getElementById('u-username').value='';
+  document.getElementById('u-pass').value='';
   showToast('✅','İstifadəçi əlavə edildi!');
   loadUsers();loadStats();
 }
 
+/* ── DELETE USER ── */
 async function deleteUser(id,btn){
   if(!confirm('Bu istifadəçini silmək istədiyinizə əminsiniz?')) return;
   btn.disabled=true;btn.textContent='...';
   await sb.from('code_archive').delete().eq('user_id',id);
   await sb.from('profiles').delete().eq('id',id);
+  // also delete auth user via admin API if available
   showToast('🗑️','İstifadəçi silindi.');
   loadUsers();loadStats();
 }
 
 /* ── ARCHIVE ── */
 async function loadArchive(){
-  const tbody=document.getElementById('archive-tbody');
-  tbody.innerHTML='<tr class="loading-row"><td colspan="7">Yüklənir...</td></tr>';
+  const tb=document.getElementById('arc-tb');
+  tb.innerHTML='<tr class="empty-row"><td colspan="7">Yüklənir...</td></tr>';
   const {data,error}=await sb.from('code_archive')
-    .select('*, profiles(full_name,email)')
-    .order('created_at',{ascending:false}).limit(200);
-  if(error||!data){tbody.innerHTML='<tr class="loading-row"><td colspan="7">Xəta baş verdi</td></tr>';return;}
+    .select('*, profiles(full_name,username,email)')
+    .order('created_at',{ascending:false}).limit(300);
+  if(error||!data){tb.innerHTML='<tr class="empty-row"><td colspan="7">Xəta baş verdi</td></tr>';return;}
   allArchive=data;
   renderArchive(data);
 }
 
 function renderArchive(data){
-  const tbody=document.getElementById('archive-tbody');
-  if(!data||data.length===0){tbody.innerHTML='<tr class="loading-row"><td colspan="7">Arxiv boşdur</td></tr>';return;}
-  tbody.innerHTML='';
+  const tb=document.getElementById('arc-tb');
+  if(!data||!data.length){tb.innerHTML='<tr class="empty-row"><td colspan="7">Arxiv boşdur</td></tr>';return;}
+
+  // compute per-user avg
+  const groups={};
+  data.forEach(r=>{if(r.score!=null){if(!groups[r.user_id])groups[r.user_id]=[];groups[r.user_id].push(r.score);}});
+  const avgMap={};
+  Object.keys(groups).forEach(uid=>{const a=groups[uid];avgMap[uid]=(a.reduce((s,v)=>s+v,0)/a.length).toFixed(1);});
+
+  tb.innerHTML='';
   data.forEach((item,i)=>{
-    const date=new Date(item.created_at).toLocaleDateString('az-AZ',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
-    const preview=(item.html_code||item.combined_code||'').substring(0,80);
-    const uname=item.profiles?.full_name||item.profiles?.email||'—';
+    const date=new Date(item.created_at).toLocaleString('az-AZ',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    const uname=item.profiles?.username||item.profiles?.full_name||item.profiles?.email?.split('@')[0]||'—';
+    const preview=(item.active_tab==='combined'?item.combined_code:(item.html_code||'')).substring(0,60);
+    const scoreHtml=item.score!=null
+      ?`<span class="score-display">${'⭐'.repeat(item.score)}</span><span class="score-num">${item.score}/5</span>`
+      :'<span style="color:#cbd5e1;font-weight:700">—</span>';
+    const avg=avgMap[item.user_id];
+    const avgHtml=avg?`<span class="score-avg-badge">⭐ ${avg}</span>`:'—';
     const tr=document.createElement('tr');
     tr.innerHTML=`
       <td>${i+1}</td>
-      <td><strong>${escHtml(uname)}</strong></td>
-      <td>${date}</td>
-      <td>${(item.lang||'az').toUpperCase()}</td>
-      <td>${(item.active_tab||'html').toUpperCase()}</td>
-      <td><code class="archive-code">${escHtml(preview)}</code></td>
-      <td><button class="btn btn-danger btn-sm" onclick="deleteArchiveItem('${item.id}',this)">🗑️ Sil</button></td>`;
-    tbody.appendChild(tr);
+      <td><strong>${esc(uname)}</strong></td>
+      <td style="white-space:nowrap">${date}</td>
+      <td><code class="code-preview">${esc(preview)}</code></td>
+      <td>${scoreHtml}</td>
+      <td>${avgHtml}</td>
+      <td style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="btn btn-view btn-sm" onclick="openModal('${item.id}')">👁️ Bax & Qiymət</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteArc('${item.id}',this)">🗑️</button>
+      </td>`;
+    tb.appendChild(tr);
   });
 }
 
 function filterArchive(){
-  const q=document.getElementById('archive-search').value.toLowerCase();
+  const q=document.getElementById('arc-search').value.toLowerCase();
+  const f=document.getElementById('arc-filter').value;
   const filtered=allArchive.filter(item=>{
-    const name=(item.profiles?.full_name||item.profiles?.email||'').toLowerCase();
-    return name.includes(q);
+    const uname=(item.profiles?.username||item.profiles?.full_name||item.profiles?.email||'').toLowerCase();
+    const matchQ=!q||uname.includes(q);
+    const matchF=f==='all'||(f==='unscored'&&item.score==null)||(f==='scored'&&item.score!=null);
+    return matchQ&&matchF;
   });
   renderArchive(filtered);
 }
 
-async function deleteArchiveItem(id,btn){
+async function deleteArc(id,btn){
   btn.disabled=true;btn.textContent='...';
   await sb.from('code_archive').delete().eq('id',id);
   btn.closest('tr').remove();
-  showToast('🗑️','Silindi.');
-  loadStats();
+  showToast('🗑️','Silindi.');loadStats();
 }
 
-function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+/* ── MODAL ── */
+async function openModal(id){
+  const item=allArchive.find(x=>x.id===id);
+  if(!item)return;
+  modalItemId=id;selectedScore=item.score||0;
 
+  const uname=item.profiles?.username||item.profiles?.full_name||'İstifadəçi';
+  document.getElementById('modal-title').textContent=`👤 ${uname} — Kod Nəticəsi`;
+
+  // build html
+  let html='';
+  if(item.active_tab==='combined'){
+    html=`<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body>${item.combined_code||''}</body></html>`;
+  } else {
+    html=`<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{margin:0;padding:10px;font-family:sans-serif;}${item.css_code||''}</style></head><body>${item.html_code||''}</body></html>`;
+  }
+
+  document.getElementById('modal-frame').srcdoc=html;
+  const codeText=(item.active_tab==='combined'?item.combined_code:('HTML:\n'+(item.html_code||'')+'\n\nCSS:\n'+(item.css_code||'')));
+  document.getElementById('modal-code').textContent=codeText;
+
+  // score UI
+  renderStars(selectedScore);
+  document.getElementById('selected-score-label').textContent=selectedScore?`${selectedScore}/5`:'';
+  const savedDisp=document.getElementById('saved-score-display');
+  if(item.score!=null){
+    savedDisp.style.display='';
+    savedDisp.textContent=`Mövcud bal: ${'⭐'.repeat(item.score)} ${item.score}/5`;
+  } else {
+    savedDisp.style.display='none';
+  }
+
+  switchModalTab('preview');
+  document.getElementById('modal-overlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function closeModal(e){
+  if(e&&e.target!==document.getElementById('modal-overlay'))return;
+  document.getElementById('modal-overlay').classList.remove('open');
+  document.body.style.overflow='';
+  modalItemId=null;selectedScore=0;
+  document.getElementById('modal-frame').srcdoc='';
+}
+
+function switchModalTab(tab){
+  modalTab=tab;
+  document.getElementById('modal-frame').style.display=tab==='preview'?'block':'none';
+  document.getElementById('modal-code').style.display=tab==='code'?'block':'none';
+  document.getElementById('mtab-preview').classList.toggle('active',tab==='preview');
+  document.getElementById('mtab-code').classList.toggle('active',tab==='code');
+}
+
+/* ── SCORING ── */
+function selectStar(val){
+  selectedScore=val;
+  renderStars(val);
+  document.getElementById('selected-score-label').textContent=`${val}/5`;
+}
+
+function renderStars(val){
+  document.querySelectorAll('.star-btn').forEach(btn=>{
+    btn.classList.toggle('on',parseInt(btn.dataset.v)<=val);
+  });
+}
+
+async function saveScore(){
+  if(!selectedScore||!modalItemId){showToast('⚠️','Əvvəlcə ulduz seçin!');return;}
+  const btn=document.getElementById('btn-save-score');
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Saxlanır...';
+
+  const {error}=await sb.from('code_archive').update({score:selectedScore}).eq('id',modalItemId);
+
+  btn.disabled=false;btn.innerHTML='💾 Qiymət Ver';
+  if(error){showToast('❌','Xəta baş verdi.');return;}
+
+  // update local data
+  const item=allArchive.find(x=>x.id===modalItemId);
+  if(item) item.score=selectedScore;
+
+  const savedDisp=document.getElementById('saved-score-display');
+  savedDisp.style.display='';
+  savedDisp.textContent=`Bal verildi: ${'⭐'.repeat(selectedScore)} ${selectedScore}/5`;
+
+  showToast('✅',`${selectedScore}/5 bal verildi!`);
+  loadStats();
+  // re-render archive table in background
+  renderArchive(allArchive);
+  filterArchive();
+}
+
+/* ── HELPERS ── */
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function showToast(emoji,msg){
   const el=document.getElementById('toast');
-  document.getElementById('toast-emoji').textContent=emoji;
-  document.getElementById('toast-msg').textContent=msg;
+  document.getElementById('t-emoji').textContent=emoji;
+  document.getElementById('t-msg').textContent=msg;
   el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2800);
 }
+
+// close modal on Escape
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape') closeModal({target:document.getElementById('modal-overlay')});
+});
 </script>
 </body>
 </html>
