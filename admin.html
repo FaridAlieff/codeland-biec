@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>KodLand 🛡️ — Admin Panel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <style>
+    :root{
+      --f-ui:'Nunito',sans-serif;--f-head:'Baloo 2',sans-serif;
+      --bg:#f8fafc;--card:#fff;--text:#1e293b;--sub:#64748b;
+      --border:#e2e8f0;--shadow:0 4px 20px rgba(0,0,0,.08);--radius:16px;
+      --purple:#7c3aed;--red:#dc2626;--green:#16a34a;--blue:#2563eb;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:var(--f-ui);background:var(--bg);color:var(--text);min-height:100vh;}
+
+    /* HEADER */
+    header{background:linear-gradient(135deg,#1e293b,#334155);height:64px;padding:0 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 4px 16px rgba(0,0,0,.2);}
+    .logo{display:flex;align-items:center;gap:10px;}
+    .logo-icon{width:40px;height:40px;background:linear-gradient(135deg,#6ec6f5,#a78bfa);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;}
+    .logo-text{font-family:var(--f-head);font-size:22px;font-weight:800;color:white;}
+    .logo-badge{background:#7c3aed;color:white;border-radius:8px;padding:3px 10px;font-size:12px;font-weight:800;letter-spacing:.5px;}
+    .btn-hdr{background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.2);border-radius:9px;padding:6px 14px;cursor:pointer;font-family:var(--f-ui);font-size:13px;font-weight:700;color:white;transition:all .18s;}
+    .btn-hdr:hover{background:rgba(255,255,255,.2);}
+    .btn-hdr-edit{background:rgba(110,198,245,.15);border-color:rgba(110,198,245,.4);}
+
+    /* MAIN */
+    main{max-width:1200px;margin:0 auto;padding:28px 20px 48px;}
+
+    h2.section-title{font-family:var(--f-head);font-size:22px;font-weight:800;color:var(--text);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+
+    /* STATS ROW */
+    .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:32px;}
+    .stat-card{background:var(--card);border-radius:var(--radius);padding:20px;border:2px solid var(--border);box-shadow:var(--shadow);text-align:center;}
+    .stat-icon{font-size:32px;margin-bottom:6px;}
+    .stat-num{font-family:var(--f-head);font-size:32px;font-weight:800;color:var(--text);}
+    .stat-label{font-size:13px;font-weight:700;color:var(--sub);margin-top:2px;}
+
+    /* ADD USER CARD */
+    .card{background:var(--card);border-radius:var(--radius);border:2px solid var(--border);box-shadow:var(--shadow);padding:24px;margin-bottom:24px;}
+    .form-row{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:12px;align-items:end;}
+    @media(max-width:700px){.form-row{grid-template-columns:1fr;}}
+    .form-group label{display:block;font-weight:700;font-size:13px;color:var(--sub);margin-bottom:5px;}
+    input,select{width:100%;padding:11px 14px;border:2px solid var(--border);border-radius:12px;font-family:var(--f-ui);font-size:14px;color:var(--text);outline:none;transition:border-color .18s;background:#fafbfd;}
+    input:focus,select:focus{border-color:#a78bfa;background:white;}
+
+    .btn{border:none;border-radius:11px;font-family:var(--f-head);font-size:15px;font-weight:700;cursor:pointer;transition:all .18s;display:inline-flex;align-items:center;gap:6px;padding:10px 20px;white-space:nowrap;}
+    .btn-primary{background:linear-gradient(135deg,#6ec6f5,#a78bfa);color:white;box-shadow:0 4px 14px rgba(167,139,250,.35);}
+    .btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(167,139,250,.45);}
+    .btn-danger{background:#fff0f0;color:var(--red);border:2px solid #fecaca;}
+    .btn-danger:hover{background:#fecaca;}
+    .btn-sm{font-size:13px;padding:7px 14px;}
+    .btn-success{background:#f0fdf4;color:var(--green);border:2px solid #bbf7d0;}
+    .btn-success:hover{background:#dcfce7;}
+
+    /* USER TABLE */
+    .table-wrap{overflow-x:auto;border-radius:var(--radius);border:2px solid var(--border);}
+    table{width:100%;border-collapse:collapse;background:var(--card);}
+    thead{background:linear-gradient(90deg,#f8fafc,#f1f5f9);}
+    th{padding:13px 16px;text-align:left;font-family:var(--f-head);font-size:14px;font-weight:700;color:var(--sub);border-bottom:2px solid var(--border);}
+    td{padding:13px 16px;border-bottom:1px solid var(--border);font-size:14px;font-weight:600;}
+    tr:last-child td{border-bottom:none;}
+    tr:hover td{background:#f8fafc;}
+
+    .role-badge{display:inline-block;border-radius:8px;padding:3px 10px;font-size:12px;font-weight:800;}
+    .role-admin{background:#ede9fe;color:#7c3aed;}
+    .role-user{background:#ecfdf5;color:#059669;}
+
+    /* ARCHIVE TABLE */
+    .archive-code{font-family:monospace;font-size:12px;color:#475569;background:#f1f5f9;border-radius:6px;padding:4px 8px;max-width:250px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;}
+
+    /* TABS */
+    .admin-tabs{display:flex;gap:4px;margin-bottom:20px;background:#f1f5f9;border-radius:14px;padding:4px;width:fit-content;}
+    .admin-tab{padding:9px 20px;border:none;background:transparent;font-family:var(--f-head);font-size:15px;font-weight:700;color:var(--sub);cursor:pointer;border-radius:10px;transition:all .18s;}
+    .admin-tab.active{background:white;color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.08);}
+
+    /* toast */
+    .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:#1e293b;color:white;padding:11px 22px;border-radius:28px;font-family:var(--f-head);font-size:15px;opacity:0;transition:all .35s cubic-bezier(.34,1.56,.64,1);z-index:999;pointer-events:none;display:flex;align-items:center;gap:7px;}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+    .spinner{display:inline-block;width:16px;height:16px;border:3px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+    .loading-row td{text-align:center;padding:30px;color:var(--sub);}
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">🛡️</div>
+    <div class="logo-text">KodLand</div>
+    <div class="logo-badge">ADMIN</div>
+  </div>
+  <div style="display:flex;gap:8px;">
+    <button class="btn-hdr btn-hdr-edit" onclick="window.location.href='editor.html'">✏️ Redaktor</button>
+    <button class="btn-hdr" onclick="doLogout()">🚪 Çıx</button>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main>
+  <!-- STATS -->
+  <div class="stats" id="stats-row">
+    <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-num" id="stat-users">—</div><div class="stat-label">İstifadəçi</div></div>
+    <div class="stat-card"><div class="stat-icon">💾</div><div class="stat-num" id="stat-runs">—</div><div class="stat-label">Saxlanılmış Kod</div></div>
+    <div class="stat-card"><div class="stat-icon">⭐</div><div class="stat-num" id="stat-today">—</div><div class="stat-label">Bu gün</div></div>
+  </div>
+
+  <!-- TABS -->
+  <div class="admin-tabs">
+    <button class="admin-tab active" onclick="showSection('users')">👥 İstifadəçilər</button>
+    <button class="admin-tab"        onclick="showSection('archive')">📂 Arxiv</button>
+  </div>
+
+  <!-- USERS SECTION -->
+  <div id="section-users">
+    <h2 class="section-title">👥 İstifadəçi Əlavə Et</h2>
+    <div class="card">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Ad Soyad</label>
+          <input type="text" id="new-name" placeholder="Ad Soyad"/>
+        </div>
+        <div class="form-group">
+          <label>E-poçt</label>
+          <input type="email" id="new-email" placeholder="email@example.com"/>
+        </div>
+        <div class="form-group">
+          <label>Şifrə</label>
+          <input type="password" id="new-pass" placeholder="Şifrə"/>
+        </div>
+        <div class="form-group">
+          <label>Rol</label>
+          <select id="new-role">
+            <option value="user">İstifadəçi</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+      </div>
+      <div style="margin-top:14px;display:flex;gap:10px;align-items:center;">
+        <button class="btn btn-primary" onclick="addUser()" id="btn-add-user">➕ İstifadəçi Əlavə Et</button>
+        <div id="add-error" style="font-size:13px;font-weight:700;color:#dc2626;display:none;"></div>
+      </div>
+    </div>
+
+    <h2 class="section-title">👥 Bütün İstifadəçilər</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>Ad</th><th>E-poçt</th><th>Rol</th><th>Qeydiyyat</th><th>Əməliyyat</th></tr></thead>
+        <tbody id="users-tbody"><tr class="loading-row"><td colspan="6">Yüklənir...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ARCHIVE SECTION -->
+  <div id="section-archive" style="display:none">
+    <h2 class="section-title">📂 Bütün Saxlanılmış Kodlar</h2>
+    <div style="margin-bottom:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+      <input type="text" id="archive-search" placeholder="🔍 İstifadəçi adı axtar..." style="max-width:280px;" oninput="filterArchive()"/>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>İstifadəçi</th><th>Tarix / Saat</th><th>Dil</th><th>Tab</th><th>HTML Kod</th><th>Əməliyyat</th></tr></thead>
+        <tbody id="archive-tbody"><tr class="loading-row"><td colspan="7">Yüklənir...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<div class="toast" id="toast"><span id="toast-emoji">✅</span><span id="toast-msg"></span></div>
+
+<script>
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
+
+let currentAdmin=null;
+let allArchive=[];
+
+/* ── AUTH GUARD (admin only) ── */
+(async()=>{
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session){window.location.href='index.html';return;}
+  const {data:profile}=await sb.from('profiles').select('role').eq('id',session.user.id).single();
+  if(profile?.role!=='admin'){window.location.href='editor.html';return;}
+  currentAdmin=session.user;
+  loadStats();
+  loadUsers();
+})();
+
+async function doLogout(){
+  await sb.auth.signOut();
+  window.location.href='index.html';
+}
+
+/* ── SECTION SWITCH ── */
+function showSection(sec){
+  document.getElementById('section-users').style.display=sec==='users'?'':'none';
+  document.getElementById('section-archive').style.display=sec==='archive'?'':'none';
+  document.querySelectorAll('.admin-tab').forEach((t,i)=>t.classList.toggle('active',(sec==='users'&&i===0)||(sec==='archive'&&i===1)));
+  if(sec==='archive') loadArchive();
+}
+
+/* ── STATS ── */
+async function loadStats(){
+  const [{count:uc},{count:rc},{count:tc}]=await Promise.all([
+    sb.from('profiles').select('*',{count:'exact',head:true}),
+    sb.from('code_archive').select('*',{count:'exact',head:true}),
+    sb.from('code_archive').select('*',{count:'exact',head:true}).gte('created_at',new Date().toISOString().split('T')[0])
+  ]);
+  document.getElementById('stat-users').textContent=uc??0;
+  document.getElementById('stat-runs').textContent=rc??0;
+  document.getElementById('stat-today').textContent=tc??0;
+}
+
+/* ── USERS ── */
+async function loadUsers(){
+  const tbody=document.getElementById('users-tbody');
+  const {data,error}=await sb.from('profiles').select('*').order('created_at',{ascending:false});
+  if(error||!data){tbody.innerHTML='<tr class="loading-row"><td colspan="6">Xəta baş verdi</td></tr>';return;}
+  if(data.length===0){tbody.innerHTML='<tr class="loading-row"><td colspan="6">İstifadəçi yoxdur</td></tr>';return;}
+  tbody.innerHTML='';
+  data.forEach((u,i)=>{
+    const date=new Date(u.created_at).toLocaleDateString('az-AZ',{day:'2-digit',month:'2-digit',year:'numeric'});
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td>${i+1}</td>
+      <td><strong>${escHtml(u.full_name||'—')}</strong></td>
+      <td>${escHtml(u.email||'—')}</td>
+      <td><span class="role-badge ${u.role==='admin'?'role-admin':'role-user'}">${u.role==='admin'?'🛡️ Admin':'👤 İstifadəçi'}</span></td>
+      <td>${date}</td>
+      <td>
+        <button class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}',this)">🗑️ Sil</button>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+async function addUser(){
+  const name=document.getElementById('new-name').value.trim();
+  const email=document.getElementById('new-email').value.trim();
+  const pass=document.getElementById('new-pass').value;
+  const role=document.getElementById('new-role').value;
+  const errEl=document.getElementById('add-error');
+  errEl.style.display='none';
+
+  if(!name||!email||!pass){errEl.textContent='Bütün xanaları doldurun.';errEl.style.display='block';return;}
+
+  const btn=document.getElementById('btn-add-user');
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Əlavə edilir...';
+
+  // Use admin API via Supabase Edge Function or direct signUp
+  const {data,error}=await sb.auth.admin?.createUser?.({
+    email,password:pass,
+    email_confirm:true,
+    user_metadata:{full_name:name}
+  }) ?? await sb.auth.signUp({email,password:pass,options:{data:{full_name:name}}});
+
+  if(error){
+    errEl.textContent='Xəta: '+error.message;errEl.style.display='block';
+    btn.disabled=false;btn.innerHTML='➕ İstifadəçi Əlavə Et';return;
+  }
+
+  // set role in profiles
+  if(data?.user){
+    await sb.from('profiles').upsert({id:data.user.id,email,full_name:name,role});
+  }
+
+  btn.disabled=false;btn.innerHTML='➕ İstifadəçi Əlavə Et';
+  document.getElementById('new-name').value='';
+  document.getElementById('new-email').value='';
+  document.getElementById('new-pass').value='';
+  showToast('✅','İstifadəçi əlavə edildi!');
+  loadUsers();loadStats();
+}
+
+async function deleteUser(id,btn){
+  if(!confirm('Bu istifadəçini silmək istədiyinizə əminsiniz?')) return;
+  btn.disabled=true;btn.textContent='...';
+  await sb.from('code_archive').delete().eq('user_id',id);
+  await sb.from('profiles').delete().eq('id',id);
+  showToast('🗑️','İstifadəçi silindi.');
+  loadUsers();loadStats();
+}
+
+/* ── ARCHIVE ── */
+async function loadArchive(){
+  const tbody=document.getElementById('archive-tbody');
+  tbody.innerHTML='<tr class="loading-row"><td colspan="7">Yüklənir...</td></tr>';
+  const {data,error}=await sb.from('code_archive')
+    .select('*, profiles(full_name,email)')
+    .order('created_at',{ascending:false}).limit(200);
+  if(error||!data){tbody.innerHTML='<tr class="loading-row"><td colspan="7">Xəta baş verdi</td></tr>';return;}
+  allArchive=data;
+  renderArchive(data);
+}
+
+function renderArchive(data){
+  const tbody=document.getElementById('archive-tbody');
+  if(!data||data.length===0){tbody.innerHTML='<tr class="loading-row"><td colspan="7">Arxiv boşdur</td></tr>';return;}
+  tbody.innerHTML='';
+  data.forEach((item,i)=>{
+    const date=new Date(item.created_at).toLocaleDateString('az-AZ',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    const preview=(item.html_code||item.combined_code||'').substring(0,80);
+    const uname=item.profiles?.full_name||item.profiles?.email||'—';
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td>${i+1}</td>
+      <td><strong>${escHtml(uname)}</strong></td>
+      <td>${date}</td>
+      <td>${(item.lang||'az').toUpperCase()}</td>
+      <td>${(item.active_tab||'html').toUpperCase()}</td>
+      <td><code class="archive-code">${escHtml(preview)}</code></td>
+      <td><button class="btn btn-danger btn-sm" onclick="deleteArchiveItem('${item.id}',this)">🗑️ Sil</button></td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function filterArchive(){
+  const q=document.getElementById('archive-search').value.toLowerCase();
+  const filtered=allArchive.filter(item=>{
+    const name=(item.profiles?.full_name||item.profiles?.email||'').toLowerCase();
+    return name.includes(q);
+  });
+  renderArchive(filtered);
+}
+
+async function deleteArchiveItem(id,btn){
+  btn.disabled=true;btn.textContent='...';
+  await sb.from('code_archive').delete().eq('id',id);
+  btn.closest('tr').remove();
+  showToast('🗑️','Silindi.');
+  loadStats();
+}
+
+function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function showToast(emoji,msg){
+  const el=document.getElementById('toast');
+  document.getElementById('toast-emoji').textContent=emoji;
+  document.getElementById('toast-msg').textContent=msg;
+  el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2800);
+}
+</script>
+</body>
+</html>
