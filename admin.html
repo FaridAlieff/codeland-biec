@@ -292,9 +292,29 @@ let modalTab     = 'preview';
 (async()=>{
   const {data:{session}} = await sb.auth.getSession();
   if(!session){location.href='index.html';return;}
-  const {data:prof} = await sb.from('profiles').select('role').eq('id',session.user.id).single();
-  if(prof?.role!=='admin'){location.href='editor.html';return;}
   currentAdmin = session.user;
+
+  // RLS-siz birbaşa yoxla
+  const {data:prof, error:profErr} = await sb.rpc('get_my_role');
+
+  // RPC yoxdursa fallback: metadata-dan yoxla
+  let role = prof || session.user.user_metadata?.role || null;
+
+  // Son fallback: profiles-dan birbaşa oxu
+  if(!role){
+    const {data:p2} = await sb.from('profiles')
+      .select('role').eq('id', session.user.id).maybeSingle();
+    role = p2?.role || null;
+  }
+
+  if(role !== 'admin'){
+    // Son yoxlama: email-ə bax
+    const email = session.user.email || '';
+    if(!email.startsWith('admin')){
+      location.href='editor.html';return;
+    }
+  }
+
   loadStats(); loadUsers();
 })();
 
