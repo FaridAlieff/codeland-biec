@@ -178,7 +178,7 @@
     <div class="logo-badge">ADMIN</div>
   </div>
   <div class="hdr-btns">
-    <button class="btn-hdr btn-hdr-edit" onclick="location.href='editor.html'">✏️ Redaktor</button>
+    <button class="btn-hdr btn-hdr-edit" onclick="location.href='/editor'">✏️ Redaktor</button>
     <button class="btn-hdr" onclick="doLogout()">🚪 Çıx</button>
   </div>
 </header>
@@ -291,7 +291,7 @@ let modalTab     = 'preview';
 /* ── AUTH ── */
 (async()=>{
   const {data:{session}} = await sb.auth.getSession();
-  if(!session){location.href='index.html';return;}
+  if(!session){location.href='/login';return;}
   currentAdmin = session.user;
 
   // RLS-siz birbaşa yoxla
@@ -311,14 +311,14 @@ let modalTab     = 'preview';
     // Son yoxlama: email-ə bax
     const email = session.user.email || '';
     if(!email.startsWith('admin')){
-      location.href='editor.html';return;
+      location.href='/editor';return;
     }
   }
 
   loadStats(); loadUsers();
 })();
 
-async function doLogout(){await sb.auth.signOut();location.href='index.html';}
+async function doLogout(){await sb.auth.signOut();location.href='/login';}
 
 /* ── SECTION SWITCH ── */
 function showSection(sec){

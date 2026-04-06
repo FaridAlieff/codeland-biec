@@ -406,7 +406,7 @@ let lang='az', activeTab='html', currentUser=null;
 /* ════════ AUTH ════════ */
 (async()=>{
   const {data:{session}}=await sb.auth.getSession();
-  if(!session){window.location.href='index.html';return;}
+  if(!session){window.location.href='/login';return;}
   currentUser=session.user;
   const uname=session.user.user_metadata?.username||session.user.email.split('@')[0];
   document.getElementById('user-name').textContent=uname;
@@ -414,7 +414,7 @@ let lang='az', activeTab='html', currentUser=null;
   loadAvgScore();
 })();
 
-async function doLogout(){await sb.auth.signOut();window.location.href='index.html';}
+async function doLogout(){await sb.auth.signOut();window.location.href='/login';}
 
 /* ════════ AVG SCORE ════════ */
 async function loadAvgScore(){

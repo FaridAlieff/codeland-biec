@@ -114,7 +114,7 @@
     <span id="btn-label">Daxil ol</span>
   </button>
 
-  <div class="footer">KodLand © 2026</div>
+  <div class="footer">KodLand © 2025</div>
 </div>
 
 <script>
@@ -207,7 +207,7 @@ async function doLogin() {
   const { data: profile } = await sb.from('profiles')
     .select('role').eq('id', data.user.id).single();
 
-  window.location.href = profile?.role === 'admin' ? 'admin.html' : 'editor.html';
+  window.location.href = profile?.role === 'admin' ? '/admin' : '/editor';
 }
 
 // already logged in?
@@ -216,7 +216,7 @@ async function doLogin() {
   if (session) {
     const { data: profile } = await sb.from('profiles')
       .select('role').eq('id', session.user.id).single();
-    window.location.href = profile?.role === 'admin' ? 'admin.html' : 'editor.html';
+    window.location.href = profile?.role === 'admin' ? '/admin' : '/editor';
   }
 })();
 
