@@ -189,3 +189,75 @@ WHERE email = 'admin@kodland.local';
 | `index.html` | Hamı |
 | `editor.html` | Login olmuş şagirdlər |
 | `admin.html` | Yalnız adminlər |
+
+
+---
+
+## ⚠️ Əlavə SQL — İstifadəçi Əlavə Etmə Funksiyası
+
+Admin paneldən istifadəçi əlavə etmək üçün bu SQL-i də çalışdırın:
+
+```sql
+CREATE OR REPLACE FUNCTION create_student(
+  p_username  TEXT,
+  p_full_name TEXT,
+  p_password  TEXT,
+  p_role      TEXT DEFAULT 'user'
+)
+RETURNS JSON
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_email TEXT;
+  v_user_id UUID;
+  v_result JSON;
+BEGIN
+  -- username artıq varsa xəta ver
+  IF EXISTS (SELECT 1 FROM profiles WHERE username = p_username) THEN
+    RETURN json_build_object('error', 'Bu istifadəçi adı artıq mövcuddur.');
+  END IF;
+
+  v_email := p_username || '@kodland.local';
+
+  -- auth.users-a əlavə et
+  INSERT INTO auth.users (
+    instance_id, id, aud, role, email,
+    encrypted_password, email_confirmed_at,
+    raw_app_meta_data, raw_user_meta_data,
+    created_at, updated_at, confirmation_token, recovery_token
+  )
+  VALUES (
+    '00000000-0000-0000-0000-000000000000',
+    gen_random_uuid(),
+    'authenticated',
+    'authenticated',
+    v_email,
+    crypt(p_password, gen_salt('bf')),
+    NOW(),
+    '{"provider":"email","providers":["email"]}',
+    json_build_object('full_name', p_full_name, 'username', p_username),
+    NOW(), NOW(), '', ''
+  )
+  RETURNING id INTO v_user_id;
+
+  -- profiles cədvəlinə əlavə et
+  INSERT INTO profiles (id, email, full_name, username, role)
+  VALUES (v_user_id, v_email, p_full_name, p_username, p_role)
+  ON CONFLICT (id) DO UPDATE
+    SET full_name = p_full_name, username = p_username, role = p_role;
+
+  RETURN json_build_object('success', true, 'user_id', v_user_id);
+
+EXCEPTION WHEN OTHERS THEN
+  RETURN json_build_object('error', SQLERRM);
+END;
+$$;
+
+-- Funksiyaya icazə ver
+GRANT EXECUTE ON FUNCTION create_student TO authenticated;
+GRANT EXECUTE ON FUNCTION create_student TO anon;
+```
+
+> Bu funksiya admin-in öz sessionuna toxunmadan server tərəfindən yeni istifadəçi yaradır.

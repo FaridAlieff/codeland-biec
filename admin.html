@@ -376,39 +376,39 @@ async function addUser(){
   const errEl    = document.getElementById('add-err');
   errEl.classList.remove('show');
 
-  if(!name||!username||!pass){errEl.textContent='Bütün xanaları doldurun.';errEl.classList.add('show');return;}
-  if(pass.length<6){errEl.textContent='Şifrə minimum 6 simvol olmalıdır.';errEl.classList.add('show');return;}
-  if(!/^[a-z0-9_]+$/.test(username)){errEl.textContent='İstifadəçi adı yalnız ingilis hərfi, rəqəm və _ ola bilər.';errEl.classList.add('show');return;}
+  if(!name||!username||!pass){errEl.textContent='Butun xanalari doldurun.';errEl.classList.add('show');return;}
+  if(pass.length<6){errEl.textContent='Sifre minimum 6 simvol olmalidir.';errEl.classList.add('show');return;}
+  if(!/^[a-z0-9_]+$/.test(username)){errEl.textContent='Istifadeci adi yalniz ingilis herfi, reqem ve _ ola biler.';errEl.classList.add('show');return;}
 
   const btn=document.getElementById('btn-add');
-  btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Əlavə edilir...';
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Elave edilir...';
 
-  const email = username + DOMAIN_SUFFIX;
-
-  // signUp via client (email confirm disabled in Supabase dashboard)
-  const {data,error}=await sb.auth.signUp({
-    email, password:pass,
-    options:{data:{full_name:name, username}}
+  // Use RPC - does not touch admin session
+  const {data, error} = await sb.rpc('create_student', {
+    p_username: username,
+    p_full_name: name,
+    p_password: pass,
+    p_role: role
   });
 
-  if(error){
-    errEl.textContent='Xəta: '+error.message;errEl.classList.add('show');
-    btn.disabled=false;btn.innerHTML='➕ Əlavə et';return;
+  btn.disabled=false;btn.innerHTML='+ Elave et';
+
+  if(error || (data && data.error)){
+    const msg = error?.message || data?.error || 'Xeta bas verdi.';
+    if(msg.includes('already')||msg.includes('duplicate')||msg.includes('unique')){
+      errEl.textContent='Bu istifadeci adi artiq movcuddur.';
+    } else {
+      errEl.textContent='Xeta: '+msg;
+    }
+    errEl.classList.add('show');
+    return;
   }
 
-  // upsert profile with username + role
-  if(data?.user){
-    await sb.from('profiles').upsert({
-      id:data.user.id, email, full_name:name, username, role
-    });
-  }
-
-  btn.disabled=false;btn.innerHTML='➕ Əlavə et';
   document.getElementById('u-name').value='';
   document.getElementById('u-username').value='';
   document.getElementById('u-pass').value='';
-  showToast('✅','İstifadəçi əlavə edildi!');
-  loadUsers();loadStats();
+  showToast('OK','Istifadeci elave edildi!');
+  loadUsers(); loadStats();
 }
 
 /* ── DELETE USER ── */
